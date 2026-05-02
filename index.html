@@ -1247,11 +1247,10 @@ async function syncFromCloud() {
   setSyncStatus('syncing', 'Buscando dados...');
   try {
     // Usa proxy para contornar CORS no GET
-    const proxyUrl = 'https://api.allorigins.win/get?url=' + encodeURIComponent(SYNC_URL + '?t=' + Date.now());
+    const proxyUrl = 'https://corsproxy.io/?' + encodeURIComponent(SYNC_URL + '?t=' + Date.now());
     const res = await fetch(proxyUrl);
     if (!res.ok) throw new Error('HTTP ' + res.status);
-    const json = await res.json();
-    const text = json.contents;
+    const text = await res.text();
     if (!text || text === '{}' || text.trim() === '') {
       setSyncStatus('ok', 'Nuvem vazia — enviando dados locais');
       await syncToCloud(true);
