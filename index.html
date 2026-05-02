@@ -1177,7 +1177,7 @@ const INIT_STOCK = [
 // ════════════════════════════════════════
 //  SYNC — Google Sheets via Apps Script
 // ════════════════════════════════════════
-const SYNC_URL = 'https://script.google.com/macros/s/AKfycbx6ag8qYF4W7OHJykjcA2HlwlHPd52pGZs2kuaPav1REi5lPet7L3jyV0gPKOzZsK2Y/exec';
+const SYNC_URL = 'https://script.google.com/macros/s/AKfycbyYKs4qhhPDF1BUEEiSnwp6wsgA4JJp3vYo-v0NsnD4V_Emmitqd7IzWMYXA3iyOPcH/exec';
 
 // Verifica se a URL foi configurada
 function syncConfigured() {
@@ -1207,7 +1207,6 @@ function setSyncStatus(status, msg) {
 async function syncToCloud(immediate = false) {
   if (!syncConfigured()) { setSyncStatus('error','URL não configurada'); return; }
   if (!immediate) {
-    // Debounce: espera 2s sem novas mudanças para não sobrecarregar
     clearTimeout(syncTimer);
     syncTimer = setTimeout(() => syncToCloud(true), 2000);
     setSyncStatus('pending');
@@ -1221,11 +1220,14 @@ async function syncToCloud(immediate = false) {
       customCats: STATE.customCats || [],
       updatedAt:  new Date().toISOString(),
     };
-    const res = await fetch(SYNC_URL, {
-      method: 'POST',
-      body: JSON.stringify(payload),
+    // no-cors é necessário para Google Apps Script funcionar de domínios externos
+    await fetch(SYNC_URL, {
+      method:  'POST',
+      mode:    'no-cors',
+      headers: { 'Content-Type': 'text/plain' },
+      body:    JSON.stringify(payload),
     });
-    if (!res.ok) throw new Error('HTTP ' + res.status);
+    // no-cors não retorna resposta legível — se não lançou erro, foi ok
     lastSyncTime = new Date();
     syncOnline = true;
     const h = lastSyncTime.getHours().toString().padStart(2,'0');
@@ -1244,11 +1246,13 @@ async function syncFromCloud() {
   if (!syncConfigured()) { setSyncStatus('error','Configure a URL do Apps Script'); return; }
   setSyncStatus('syncing', 'Buscando dados...');
   try {
-    const res = await fetch(SYNC_URL + '?t=' + Date.now());
+    // Usa proxy para contornar CORS no GET
+    const proxyUrl = 'https://api.allorigins.win/get?url=' + encodeURIComponent(SYNC_URL + '?t=' + Date.now());
+    const res = await fetch(proxyUrl);
     if (!res.ok) throw new Error('HTTP ' + res.status);
-    const text = await res.text();
+    const json = await res.json();
+    const text = json.contents;
     if (!text || text === '{}' || text.trim() === '') {
-      // Nuvem vazia — sobe o estado local
       setSyncStatus('ok', 'Nuvem vazia — enviando dados locais');
       await syncToCloud(true);
       return;
@@ -1264,20 +1268,17 @@ async function syncFromCloud() {
     const localTime = localRaw ? new Date(localRaw).getTime() : 0;
 
     if (cloudTime > localTime) {
-      // Nuvem é mais recente — puxa
       STATE.stock      = cloud.stock      || STATE.stock;
       STATE.log        = cloud.log        || STATE.log;
       STATE.customCats = cloud.customCats || STATE.customCats;
       saveStateLocal();
       syncOnline = true;
-      setSyncStatus('ok', 'Dados atualizados da nuvem ☁️');
-      // Re-renderiza página atual
+      setSyncStatus('ok', 'Dados atualizados ☁️');
       const activePage = document.querySelector('.page.active');
       if (activePage) renderPage(activePage.id.replace('page-',''));
       refreshAllCatSelects && refreshAllCatSelects();
       updateBadge && updateBadge();
     } else {
-      // Local é mais recente — sobe
       syncOnline = true;
       await syncToCloud(true);
     }
