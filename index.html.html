@@ -1,0 +1,2582 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UdiPods — Dashboard Pro</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+:root {
+  --bg:#07080f; --surface:#0d0f18; --card:#11131d; --card2:#161824;
+  --border:rgba(255,255,255,0.06); --border-hi:rgba(255,255,255,0.1);
+  --border-glow:rgba(79,156,249,0.25);
+  --text:#e8eaf0; --muted:#4e5670; --muted2:#6b7494;
+  --blue:#4f9cf9; --green:#22d3a0; --orange:#f97316;
+  --purple:#a78bfa; --pink:#fb7185; --yellow:#fbbf24;
+  --blue-dim:rgba(79,156,249,0.12); --green-dim:rgba(34,211,160,0.12);
+  --orange-dim:rgba(249,115,22,0.12); --purple-dim:rgba(167,139,250,0.12);
+  --pink-dim:rgba(251,113,133,0.12); --yellow-dim:rgba(251,191,36,0.12);
+  --font-d:'Syne',sans-serif; --font-b:'DM Sans',sans-serif;
+  --r:14px; --r2:10px; --r3:8px;
+  --nav-w:240px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--font-b);font-size:14px;line-height:1.6;min-height:100vh;overflow-x:hidden;display:flex}
+body::after{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");pointer-events:none;z-index:9999;opacity:.5}
+
+/* ─── SIDEBAR ─── */
+nav{width:var(--nav-w);min-height:100vh;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;left:0;top:0;z-index:50;padding:0}
+.nav-logo{padding:20px 20px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px}
+.nav-logo-icon{width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,var(--blue),var(--purple));display:flex;align-items:center;justify-content:center;font-size:19px;box-shadow:0 0 24px rgba(79,156,249,.35);flex-shrink:0}
+.nav-logo-text{font-family:var(--font-d);font-weight:800;font-size:17px;letter-spacing:-.5px;background:linear-gradient(90deg,#fff 0%,var(--blue) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.nav-logo-sub{font-size:10px;color:var(--muted);font-weight:300;-webkit-text-fill-color:var(--muted);margin-top:1px}
+.nav-section{padding:20px 12px 6px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--muted)}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:var(--r3);margin:1px 8px;cursor:pointer;font-size:13px;font-weight:500;color:var(--muted2);transition:all .2s;border:none;background:transparent;width:calc(100% - 16px);text-align:left;font-family:var(--font-b)}
+.nav-item:hover{background:rgba(255,255,255,.04);color:var(--text)}
+.nav-item.active{background:var(--blue-dim);color:var(--blue);border:1px solid rgba(79,156,249,.2)}
+.nav-item .icon{font-size:16px;width:20px;text-align:center;flex-shrink:0}
+.nav-item .badge{margin-left:auto;background:var(--pink-dim);color:var(--pink);border-radius:20px;padding:1px 7px;font-size:10px;font-weight:700}
+.nav-bottom{margin-top:auto;padding:16px;border-top:1px solid var(--border)}
+.clock{font-family:var(--font-d);font-size:22px;font-weight:700;color:var(--text);letter-spacing:-1px}
+.clock-date{font-size:11px;color:var(--muted);margin-top:2px}
+.sync-bar{display:flex;align-items:center;gap:7px;padding:8px 10px;border-radius:var(--r3);border:1px solid rgba(34,211,160,.2);background:var(--green-dim);margin-top:12px;cursor:pointer;transition:opacity .2s}
+.sync-bar:hover{opacity:.8}
+.sync-btn{width:100%;margin-top:8px;padding:7px;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:var(--r3);color:var(--muted2);font-size:11px;font-weight:600;cursor:pointer;font-family:var(--font-b);transition:all .2s}
+.sync-btn:hover{background:rgba(255,255,255,.08);color:var(--text)}
+
+/* ─── MAIN ─── */
+.main-wrap{margin-left:var(--nav-w);flex:1;min-height:100vh;display:flex;flex-direction:column}
+
+/* ─── TOPBAR ─── */
+.topbar{background:rgba(7,8,15,.85);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:0 28px;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:40}
+.topbar-title{font-family:var(--font-d);font-size:18px;font-weight:700;letter-spacing:-.5px}
+.topbar-right{display:flex;align-items:center;gap:10px}
+.badge-live{display:flex;align-items:center;gap:6px;background:var(--green-dim);border:1px solid rgba(34,211,160,.2);border-radius:20px;padding:4px 12px;font-size:11px;color:var(--green);font-weight:600}
+.dot-live{width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse-g 2s ease-in-out infinite}
+@keyframes pulse-g{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(34,211,160,.5)}50%{opacity:.7;box-shadow:0 0 0 5px rgba(34,211,160,0)}}
+
+/* ─── PAGE ─── */
+.page{padding:28px;display:none;animation:fadeUp .4s ease both}
+.page.active{display:block}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+
+.page-header{margin-bottom:24px}
+.page-header h1{font-family:var(--font-d);font-size:26px;font-weight:800;letter-spacing:-1px;background:linear-gradient(135deg,#fff 0%,rgba(255,255,255,.55) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.page-header p{font-size:13px;color:var(--muted);font-weight:300;margin-top:3px}
+
+/* ─── SECTION LABEL ─── */
+.sl{font-family:var(--font-d);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.15em;color:var(--muted);margin:32px 0 14px;display:flex;align-items:center;gap:10px}
+.sl::after{content:'';flex:1;height:1px;background:var(--border)}
+
+/* ─── KPI GRID ─── */
+.kpi-grid{display:grid;gap:14px}
+.kpi-grid-5{grid-template-columns:repeat(5,1fr)}
+.kpi-grid-4{grid-template-columns:repeat(4,1fr)}
+.kpi-grid-3{grid-template-columns:repeat(3,1fr)}
+
+.kpi{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:18px 20px;position:relative;overflow:hidden;cursor:default;transition:transform .2s,border-color .2s,box-shadow .2s}
+.kpi:hover{transform:translateY(-3px);border-color:var(--border-hi);box-shadow:0 12px 40px rgba(0,0,0,.4)}
+.kpi::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;border-radius:var(--r) var(--r) 0 0}
+.kpi.blue::before{background:linear-gradient(90deg,var(--blue),transparent)}
+.kpi.green::before{background:linear-gradient(90deg,var(--green),transparent)}
+.kpi.orange::before{background:linear-gradient(90deg,var(--orange),transparent)}
+.kpi.purple::before{background:linear-gradient(90deg,var(--purple),transparent)}
+.kpi.pink::before{background:linear-gradient(90deg,var(--pink),transparent)}
+.kpi.yellow::before{background:linear-gradient(90deg,var(--yellow),transparent)}
+.kpi-glow{position:absolute;top:-40px;right:-40px;width:120px;height:120px;border-radius:50%;opacity:.07;pointer-events:none}
+.kpi.blue .kpi-glow{background:var(--blue)} .kpi.green .kpi-glow{background:var(--green)}
+.kpi.orange .kpi-glow{background:var(--orange)} .kpi.purple .kpi-glow{background:var(--purple)}
+.kpi.pink .kpi-glow{background:var(--pink)} .kpi.yellow .kpi-glow{background:var(--yellow)}
+.kpi-label{font-size:10px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.09em;margin-bottom:7px}
+.kpi-value{font-family:var(--font-d);font-size:24px;font-weight:700;line-height:1;margin-bottom:9px;letter-spacing:-.5px}
+.kpi.blue .kpi-value{color:#fff} .kpi.green .kpi-value{color:var(--green)}
+.kpi.orange .kpi-value{color:var(--orange)} .kpi.purple .kpi-value{color:var(--purple)}
+.kpi.pink .kpi-value{color:var(--pink)} .kpi.yellow .kpi-value{color:var(--yellow)}
+.kpi-sub{font-size:11px;color:var(--muted);font-weight:300}
+.kpi-badge{display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:700;padding:2px 7px;border-radius:5px}
+.kpi-badge.up{background:var(--green-dim);color:var(--green);border:1px solid rgba(34,211,160,.2)}
+.kpi-badge.down{background:var(--pink-dim);color:var(--pink);border:1px solid rgba(251,113,133,.2)}
+.kpi-badge.neu{background:var(--blue-dim);color:var(--blue);border:1px solid rgba(79,156,249,.2)}
+
+/* ─── CHART CARD ─── */
+.chart-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:22px;position:relative;overflow:hidden;transition:border-color .2s}
+.chart-card:hover{border-color:var(--border-hi)}
+.chart-title{font-family:var(--font-d);font-size:14px;font-weight:700;letter-spacing:-.3px;color:var(--text)}
+.chart-sub{font-size:11px;color:var(--muted);margin-top:3px;font-weight:300}
+.chart-header{margin-bottom:18px;display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.grid-2-1{display:grid;grid-template-columns:2fr 1fr;gap:14px}
+.grid-1-2{display:grid;grid-template-columns:1fr 2fr;gap:14px}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+.gap-top{margin-top:14px}
+
+/* ─── PERIOD TABS ─── */
+.period-tabs{display:flex;gap:3px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r3);padding:3px}
+.ptab{padding:4px 12px;border-radius:5px;font-size:11px;font-weight:600;cursor:pointer;border:none;background:transparent;color:var(--muted);transition:all .2s;font-family:var(--font-b)}
+.ptab.active{background:var(--blue);color:#fff;box-shadow:0 0 14px rgba(79,156,249,.3)}
+.ptab:hover:not(.active){color:var(--text);background:rgba(255,255,255,.04)}
+
+/* ─── TABLE ─── */
+.table-wrap{overflow-x:auto;border-radius:var(--r2)}
+table{width:100%;border-collapse:collapse;min-width:600px}
+thead th{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:var(--muted);padding:10px 14px;text-align:left;border-bottom:1px solid var(--border);white-space:nowrap;cursor:pointer;user-select:none}
+thead th:hover{color:var(--text)}
+tbody td{padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.025);font-size:13px;white-space:nowrap}
+tbody tr:hover td{background:rgba(255,255,255,.02)}
+tbody tr:last-child td{border-bottom:none}
+
+/* ─── PILLS / TAGS ─── */
+.tag{display:inline-block;padding:2px 8px;border-radius:5px;font-size:10px;font-weight:700}
+.tag-blue{background:var(--blue-dim);color:var(--blue)} .tag-green{background:var(--green-dim);color:var(--green)}
+.tag-orange{background:var(--orange-dim);color:var(--orange)} .tag-pink{background:var(--pink-dim);color:var(--pink)}
+.tag-purple{background:var(--purple-dim);color:var(--purple)} .tag-yellow{background:var(--yellow-dim);color:var(--yellow)}
+.st-ok{color:var(--green)} .st-low{color:var(--orange)} .st-out{color:var(--pink)}
+
+/* ─── BUTTONS ─── */
+.btn{padding:7px 16px;border-radius:var(--r3);font-size:12px;font-weight:600;cursor:pointer;border:1px solid transparent;transition:all .2s;font-family:var(--font-b);display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.btn-primary{background:linear-gradient(135deg,var(--blue),var(--purple));color:#fff;border:none;box-shadow:0 0 20px rgba(79,156,249,.2)}
+.btn-primary:hover{opacity:.88;transform:translateY(-1px)}
+.btn-green{background:var(--green-dim);color:var(--green);border-color:rgba(34,211,160,.3)}
+.btn-green:hover{background:rgba(34,211,160,.2)}
+.btn-orange{background:var(--orange-dim);color:var(--orange);border-color:rgba(249,115,22,.3)}
+.btn-orange:hover{background:rgba(249,115,22,.2)}
+.btn-pink{background:var(--pink-dim);color:var(--pink);border-color:rgba(251,113,133,.3)}
+.btn-pink:hover{background:rgba(251,113,133,.2)}
+.btn-ghost{background:rgba(255,255,255,.04);color:var(--muted2);border-color:var(--border)}
+.btn-ghost:hover{color:var(--text);background:rgba(255,255,255,.07)}
+.btn-full{width:100%;justify-content:center;padding:11px}
+.btn-lg{padding:11px 24px;font-size:13px}
+
+/* ─── FORM ─── */
+.form-group{margin-bottom:14px}
+.form-label{display:block;font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.09em;margin-bottom:6px}
+.form-control{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:var(--r3);padding:9px 12px;font-size:13px;color:var(--text);font-family:var(--font-b);outline:none;transition:border-color .2s,box-shadow .2s;-webkit-text-fill-color:var(--text)}
+.form-control:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(79,156,249,.1)}
+select.form-control option{background:var(--card)}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.form-row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+
+/* ─── CALC BOX ─── */
+.calc-box{background:var(--surface);border:1px solid var(--border);border-radius:var(--r2);padding:14px 16px;display:grid;gap:10px;margin:4px 0 14px}
+.calc-row{display:flex;align-items:center;justify-content:space-between}
+.calc-label{font-size:11px;color:var(--muted);font-weight:500}
+.calc-val{font-family:var(--font-d);font-size:16px;font-weight:700}
+.calc-divider{height:1px;background:var(--border);margin:2px 0}
+
+/* ─── MODAL ─── */
+.overlay{position:fixed;inset:0;background:rgba(7,8,15,.82);backdrop-filter:blur(12px);z-index:200;display:none;align-items:center;justify-content:center;padding:20px}
+.overlay.open{display:flex}
+.modal{background:var(--card);border:1px solid var(--border-glow);border-radius:18px;width:100%;max-width:500px;max-height:90vh;overflow-y:auto;padding:28px;animation:modalIn .28s ease;box-shadow:0 28px 80px rgba(0,0,0,.65),0 0 0 1px rgba(79,156,249,.08)}
+.modal.wide{max-width:620px}
+@keyframes modalIn{from{transform:translateY(18px) scale(.97);opacity:0}to{transform:translateY(0) scale(1);opacity:1}}
+.modal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px}
+.modal-title{font-family:var(--font-d);font-size:19px;font-weight:800;letter-spacing:-.5px}
+.modal-close{background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:var(--r3);width:32px;height:32px;cursor:pointer;color:var(--muted);font-size:15px;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.modal-close:hover{background:var(--pink-dim);color:var(--pink);border-color:rgba(251,113,133,.3)}
+
+/* ─── TOAST ─── */
+.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(20px);z-index:500;background:var(--card2);border:1px solid var(--border-hi);color:var(--text);font-weight:600;font-size:13px;padding:10px 20px;border-radius:12px;opacity:0;transition:all .3s;pointer-events:none;white-space:nowrap;box-shadow:0 8px 32px rgba(0,0,0,.5)}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+.toast.success{border-color:rgba(34,211,160,.4);color:var(--green)}
+.toast.error{border-color:rgba(251,113,133,.4);color:var(--pink)}
+.toast.info{border-color:rgba(79,156,249,.4);color:var(--blue)}
+
+/* ─── CONFIRM DIALOG ─── */
+.confirm-box{background:var(--card);border:1px solid rgba(251,113,133,.3);border-radius:var(--r);padding:20px;margin-top:16px;animation:fadeUp .2s ease}
+.confirm-box p{font-size:13px;color:var(--muted2);margin-bottom:14px}
+.confirm-actions{display:flex;gap:8px}
+
+/* ─── SEARCH ─── */
+.search-wrap{position:relative;display:inline-block}
+.search-wrap input{padding-left:32px}
+.search-wrap::before{content:'🔍';position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:12px;pointer-events:none}
+
+/* ─── EMPTY STATE ─── */
+.empty{text-align:center;padding:40px 20px;color:var(--muted)}
+.empty .ei{font-size:32px;margin-bottom:12px}
+
+/* ─── FAB ─── */
+.fab{position:fixed;bottom:28px;right:28px;z-index:100;background:linear-gradient(135deg,var(--blue),var(--purple));border:none;border-radius:50%;width:54px;height:54px;font-size:22px;cursor:pointer;box-shadow:0 4px 24px rgba(79,156,249,.45);display:flex;align-items:center;justify-content:center;color:#fff;transition:transform .2s,box-shadow .2s}
+.fab:hover{transform:scale(1.1);box-shadow:0 8px 32px rgba(79,156,249,.6)}
+
+/* ─── PROGRESS BAR ─── */
+.prog-bar{height:5px;border-radius:3px;background:var(--surface);overflow:hidden;margin-top:6px}
+.prog-fill{height:100%;border-radius:3px;transition:width .6s ease}
+
+/* ─── STOCK ROW ACTIONS ─── */
+.row-actions{display:flex;gap:4px;opacity:0;transition:opacity .2s}
+tbody tr:hover .row-actions{opacity:1}
+
+/* ─── ACTIVITY FEED ─── */
+.feed-item{display:flex;align-items:flex-start;gap:12px;padding:12px 0;border-bottom:1px solid var(--border)}
+.feed-item:last-child{border-bottom:none}
+.feed-dot{width:8px;height:8px;border-radius:50%;margin-top:6px;flex-shrink:0}
+.feed-body{flex:1;min-width:0}
+.feed-title{font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.feed-sub{font-size:11px;color:var(--muted);margin-top:1px}
+.feed-val{font-family:var(--font-d);font-size:13px;font-weight:700;flex-shrink:0}
+
+/* ─── SCROLLBAR ─── */
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:rgba(255,255,255,.09);border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:rgba(255,255,255,.16)}
+</style>
+</head>
+<body>
+
+<!-- ═══ SIDEBAR ═══ -->
+<nav id="sidebar">
+  <div class="nav-logo">
+    <div class="nav-logo-icon">💨</div>
+    <div>
+      <div class="nav-logo-text">UdiPods</div>
+      <div class="nav-logo-sub">Gestão Pro · v2.0</div>
+    </div>
+  </div>
+
+  <div class="nav-section">Painel</div>
+  <button class="nav-item active" onclick="goPage('overview')" id="nav-overview">
+    <span class="icon">📊</span> Visão Geral
+  </button>
+  <button class="nav-item" onclick="goPage('financeiro')" id="nav-financeiro">
+    <span class="icon">💰</span> Financeiro
+  </button>
+
+  <div class="nav-section">Operações</div>
+  <button class="nav-item" onclick="goPage('vendas')" id="nav-vendas">
+    <span class="icon">🛒</span> Registrar Venda
+  </button>
+  <button class="nav-item" onclick="goPage('estoque')" id="nav-estoque">
+    <span class="icon">📦</span> Estoque
+  </button>
+  <button class="nav-item" onclick="goPage('historico')" id="nav-historico">
+    <span class="icon">📋</span> Histórico
+    <span class="badge" id="badge-hist">0</span>
+  </button>
+
+  <div class="nav-section">Configuração</div>
+  <button class="nav-item" onclick="goPage('cadastro')" id="nav-cadastro">
+    <span class="icon">🗂️</span> Cadastro de Produtos
+  </button>
+
+  <div class="nav-bottom">
+    <div class="clock" id="clock">--:--</div>
+    <div class="clock-date" id="clock-date">Carregando...</div>
+    <div class="sync-bar" id="sync-status" onclick="syncFromCloud()" title="Clique para sincronizar agora">
+      <span style="font-size:13px">☁️</span>
+      <span style="font-size:11px;font-weight:600;color:var(--green)">Conectando...</span>
+    </div>
+    <button class="sync-btn" onclick="syncFromCloud()">🔄 Sincronizar Agora</button>
+  </div>
+</nav>
+
+<!-- ═══ MAIN ═══ -->
+<div class="main-wrap">
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="topbar-title" id="topbar-title">Visão Geral</div>
+    <div class="topbar-right">
+      <div class="badge-live"><span class="dot-live"></span>Sistema Ativo</div>
+      <button class="btn btn-green" onclick="goPage('vendas')">＋ Nova Venda</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════
+       PAGE: VISÃO GERAL
+  ══════════════════════════════ -->
+  <div class="page active" id="page-overview">
+    <div class="page-header">
+      <h1>Visão Geral</h1>
+      <p id="ov-subtitle">Resumo completo do inventário e performance de vendas</p>
+    </div>
+
+    <!-- KPIs Estoque -->
+    <div class="sl">Estoque Atual</div>
+    <div class="kpi-grid kpi-grid-5" id="ov-kpis-estoque"></div>
+
+    <!-- KPIs Vendas Hoje -->
+    <div class="sl">Performance de Hoje</div>
+    <div class="kpi-grid kpi-grid-4" id="ov-kpis-hoje"></div>
+
+    <!-- Charts row 1 -->
+    <div class="sl">Distribuição do Estoque</div>
+    <div class="grid-2">
+      <div class="chart-card">
+        <div class="chart-header">
+          <div><div class="chart-title">Valor por Categoria</div><div class="chart-sub">Distribuição do valor em estoque (preço de venda)</div></div>
+        </div>
+        <div style="height:240px"><canvas id="c-ov-cat"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-header">
+          <div><div class="chart-title">Top 8 Modelos — Valor</div><div class="chart-sub">Modelos com maior capital imobilizado</div></div>
+        </div>
+        <div style="height:240px"><canvas id="c-ov-topval"></canvas></div>
+      </div>
+    </div>
+
+    <!-- Charts row 2 -->
+    <div class="grid-2 gap-top">
+      <div class="chart-card">
+        <div class="chart-header">
+          <div><div class="chart-title">Receita de Vendas — Últimos 30 dias</div><div class="chart-sub">Evolução diária da receita registrada</div></div>
+          <div class="period-tabs">
+            <button class="ptab active" onclick="changeSalesPeriod(7,this)">7D</button>
+            <button class="ptab" onclick="changeSalesPeriod(30,this)">30D</button>
+            <button class="ptab" onclick="changeSalesPeriod(90,this)">90D</button>
+          </div>
+        </div>
+        <div style="height:220px"><canvas id="c-ov-receita"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-header">
+          <div><div class="chart-title">Lucro vs Custo</div><div class="chart-sub">Decomposição do valor total em estoque</div></div>
+        </div>
+        <div style="height:220px"><canvas id="c-ov-decomp"></canvas></div>
+      </div>
+    </div>
+
+    <!-- Activity feed + alerts -->
+    <div class="grid-1-2 gap-top" style="grid-template-columns:1fr 1.6fr">
+      <div class="chart-card">
+        <div class="chart-header"><div><div class="chart-title">⚠️ Alertas de Estoque</div><div class="chart-sub">Produtos zerados ou em nível crítico</div></div></div>
+        <div id="alerts-feed"></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-header"><div><div class="chart-title">🕐 Últimas Atividades</div><div class="chart-sub">Movimentos recentes de estoque e vendas</div></div></div>
+        <div id="activity-feed"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════
+       PAGE: FINANCEIRO
+  ══════════════════════════════ -->
+  <div class="page" id="page-financeiro">
+    <div class="page-header">
+      <h1>Financeiro</h1>
+      <p>Lucro, receita e margem por período</p>
+    </div>
+
+    <div class="sl">Selecionar Período
+      <div class="period-tabs" style="margin-left:0">
+        <button class="ptab active" onclick="setFinPeriod('dia',this)">Hoje</button>
+        <button class="ptab" onclick="setFinPeriod('semana',this)">Semana</button>
+        <button class="ptab" onclick="setFinPeriod('mes',this)">Mês</button>
+        <button class="ptab" onclick="setFinPeriod('tudo',this)">Tudo</button>
+      </div>
+    </div>
+
+    <div class="kpi-grid kpi-grid-4" id="fin-kpis"></div>
+
+    <div class="sl">Análise Detalhada</div>
+    <div class="grid-2">
+      <div class="chart-card">
+        <div class="chart-header">
+          <div><div class="chart-title">Receita × Lucro × Custo</div><div class="chart-sub" id="fin-chart-sub">Comparação por dia no período</div></div>
+        </div>
+        <div style="height:260px"><canvas id="c-fin-main"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-header">
+          <div><div class="chart-title">Receita por Categoria</div><div class="chart-sub">Contribuição de cada grupo de produtos</div></div>
+        </div>
+        <div style="height:260px"><canvas id="c-fin-cat"></canvas></div>
+      </div>
+    </div>
+
+    <div class="grid-2 gap-top">
+      <div class="chart-card">
+        <div class="chart-header"><div><div class="chart-title">Evolução da Margem %</div><div class="chart-sub">Margem líquida por data de venda</div></div></div>
+        <div style="height:200px"><canvas id="c-fin-margem"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-header"><div><div class="chart-title">Top Produtos Vendidos</div><div class="chart-sub">Ranking por receita gerada no período</div></div></div>
+        <div style="height:200px"><canvas id="c-fin-top"></canvas></div>
+      </div>
+    </div>
+
+    <!-- Tabela resumo por dia -->
+    <div class="sl">Resumo Diário</div>
+    <div class="chart-card">
+      <div class="table-wrap">
+        <table id="fin-table">
+          <thead><tr>
+            <th>Data</th><th>Vendas</th><th>Qtd Itens</th>
+            <th>Receita</th><th>Custo</th><th>Lucro</th><th>Margem</th>
+          </tr></thead>
+          <tbody id="fin-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════
+       PAGE: REGISTRAR VENDA
+  ══════════════════════════════ -->
+  <div class="page" id="page-vendas">
+    <div class="page-header">
+      <h1>Registrar Venda</h1>
+      <p>Selecione o produto, a quantidade e confirme. O estoque será deduzido automaticamente.</p>
+    </div>
+
+    <div class="grid-2-1">
+      <!-- Formulário -->
+      <div class="chart-card">
+        <div class="chart-header"><div class="chart-title">🛒 Nova Venda</div></div>
+
+        <div class="form-group">
+          <label class="form-label">Data da Venda</label>
+          <input type="date" class="form-control" id="v-date">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Categoria</label>
+            <select class="form-control" id="v-cat" onchange="vUpdateModels()">
+              <option value="">Selecione...</option>
+              <option>PODS DESCARTÁVEIS</option>
+              <option>PODS RECARREGÁVEIS</option>
+              <option>RESISTÊNCIAS</option>
+              <option>ESSÊNCIAS</option>
+              <option>CHICLETE SLAPPLE</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Modelo</label>
+            <select class="form-control" id="v-model" onchange="vUpdateFlavors()">
+              <option value="">— selecione categoria —</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Sabor / Variação</label>
+          <select class="form-control" id="v-flavor" onchange="vAutofill()">
+            <option value="">— selecione modelo —</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Quantidade</label>
+            <input type="number" class="form-control" id="v-qty" min="1" value="1" oninput="vCalc()">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Preço Unit. (R$)</label>
+            <input type="number" class="form-control" id="v-price" step="0.01" oninput="vCalc()">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Observação (opcional)</label>
+          <input type="text" class="form-control" id="v-obs" placeholder="ex: pagamento PIX, desconto...">
+        </div>
+
+        <!-- Calc preview -->
+        <div class="calc-box" id="v-calc-box">
+          <div class="calc-row">
+            <span class="calc-label">Receita</span>
+            <span class="calc-val" style="color:var(--blue)" id="v-calc-receita">R$ 0,00</span>
+          </div>
+          <div class="calc-divider"></div>
+          <div class="calc-row">
+            <span class="calc-label">Custo</span>
+            <span class="calc-val" style="color:var(--pink)" id="v-calc-custo">R$ 0,00</span>
+          </div>
+          <div class="calc-divider"></div>
+          <div class="calc-row">
+            <span class="calc-label">Lucro</span>
+            <span class="calc-val" style="color:var(--green)" id="v-calc-lucro">R$ 0,00</span>
+          </div>
+          <div class="calc-row">
+            <span class="calc-label">Margem</span>
+            <span class="calc-val" style="color:var(--green)" id="v-calc-margem">—</span>
+          </div>
+          <div class="calc-divider"></div>
+          <div class="calc-row">
+            <span class="calc-label" style="color:var(--orange)">Estoque atual</span>
+            <span class="calc-val" style="color:var(--orange)" id="v-calc-stk">—</span>
+          </div>
+          <div class="calc-row">
+            <span class="calc-label">Após venda</span>
+            <span class="calc-val" id="v-calc-stk-after">—</span>
+          </div>
+        </div>
+
+        <div id="v-warn" style="display:none;background:var(--orange-dim);border:1px solid rgba(249,115,22,.3);border-radius:var(--r3);padding:10px 14px;margin-bottom:12px;font-size:12px;color:var(--orange)">
+          ⚠️ <span id="v-warn-msg"></span>
+        </div>
+
+        <button class="btn btn-primary btn-full btn-lg" onclick="doSale()">✓ Confirmar Venda &amp; Dar Baixa no Estoque</button>
+      </div>
+
+      <!-- Painel lateral -->
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <!-- Resumo do dia -->
+        <div class="chart-card">
+          <div class="chart-title" style="margin-bottom:14px">📈 Vendas de Hoje</div>
+          <div style="display:grid;gap:10px" id="v-today-panel"></div>
+        </div>
+        <!-- Produto selecionado -->
+        <div class="chart-card" id="v-product-info" style="display:none">
+          <div class="chart-title" style="margin-bottom:12px">📦 Produto Selecionado</div>
+          <div id="v-product-details"></div>
+        </div>
+        <!-- Últimas vendas rápidas -->
+        <div class="chart-card">
+          <div class="chart-title" style="margin-bottom:12px">🕐 Últimas Vendas</div>
+          <div id="v-recent-sales"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════
+       PAGE: ESTOQUE
+  ══════════════════════════════ -->
+  <div class="page" id="page-estoque">
+    <div class="page-header">
+      <h1>Gestão de Estoque</h1>
+      <p>Adicione produtos, ajuste quantidades e monitore níveis críticos</p>
+    </div>
+
+    <!-- KPIs rápidos -->
+    <div class="kpi-grid kpi-grid-4" id="stk-kpis"></div>
+
+    <!-- Filtros + ações -->
+    <div class="sl">Inventário Completo
+      <div style="display:flex;gap:8px;margin-left:0">
+        <div class="search-wrap">
+          <input class="form-control" id="stk-search" placeholder="Buscar produto..." style="width:200px;font-size:12px" oninput="renderStockTable()">
+        </div>
+        <select class="form-control" id="stk-filter-cat" style="width:180px;font-size:12px" onchange="renderStockTable()">
+          <option value="">Todas as categorias</option>
+          <option>PODS DESCARTÁVEIS</option>
+          <option>PODS RECARREGÁVEIS</option>
+          <option>RESISTÊNCIAS</option>
+          <option>ESSÊNCIAS</option>
+          <option>CHICLETE SLAPPLE</option>
+        </select>
+        <select class="form-control" id="stk-filter-status" style="width:150px;font-size:12px" onchange="renderStockTable()">
+          <option value="">Todos os status</option>
+          <option value="ok">✅ Em estoque</option>
+          <option value="low">⚠️ Nível baixo</option>
+          <option value="out">🔴 Zerado</option>
+        </select>
+        <button class="btn btn-green" onclick="openAddStock()">＋ Adicionar Estoque</button>
+      </div>
+    </div>
+
+    <div class="chart-card">
+      <div class="table-wrap">
+        <table>
+          <thead><tr>
+            <th onclick="stkSort(0)">Grupo ↕</th>
+            <th onclick="stkSort(1)">Modelo ↕</th>
+            <th>Sabor</th>
+            <th onclick="stkSort(3)">Qtd ↕</th>
+            <th>Preço Venda</th>
+            <th>Custo Unit.</th>
+            <th onclick="stkSort(6)">Valor Estoque ↕</th>
+            <th onclick="stkSort(7)">Margem ↕</th>
+            <th>Status</th>
+            <th>Ações</th>
+          </tr></thead>
+          <tbody id="stk-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Charts estoque -->
+    <div class="sl">Análise Visual</div>
+    <div class="grid-3">
+      <div class="chart-card">
+        <div class="chart-title" style="margin-bottom:14px">Margem por Categoria</div>
+        <div style="height:200px"><canvas id="c-stk-margem"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title" style="margin-bottom:14px">Qtd por Modelo (Top 10)</div>
+        <div style="height:200px"><canvas id="c-stk-qtd"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title" style="margin-bottom:14px">Valor vs Custo Total</div>
+        <div style="height:200px"><canvas id="c-stk-vc"></canvas></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════
+       PAGE: HISTÓRICO
+  ══════════════════════════════ -->
+  <div class="page" id="page-historico">
+    <div class="page-header">
+      <h1>Histórico de Movimentos</h1>
+      <p>Todas as vendas, entradas e ajustes de estoque registrados</p>
+    </div>
+
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap">
+      <div class="search-wrap">
+        <input class="form-control" id="hist-search" placeholder="Buscar..." style="width:200px;font-size:12px" oninput="renderHistorico()">
+      </div>
+      <select class="form-control" id="hist-type" style="width:160px;font-size:12px" onchange="renderHistorico()">
+        <option value="">Todos os tipos</option>
+        <option value="venda">🛒 Vendas</option>
+        <option value="entrada">📥 Entradas</option>
+        <option value="ajuste">🔧 Ajustes</option>
+      </select>
+      <select class="form-control" id="hist-period" style="width:150px;font-size:12px" onchange="renderHistorico()">
+        <option value="7">Últimos 7 dias</option>
+        <option value="30">Últimos 30 dias</option>
+        <option value="90">Últimos 90 dias</option>
+        <option value="0">Tudo</option>
+      </select>
+      <button class="btn btn-ghost" onclick="exportCSV()">⬇ Exportar CSV</button>
+    </div>
+
+    <div class="chart-card">
+      <div class="table-wrap">
+        <table>
+          <thead><tr>
+            <th>Data/Hora</th><th>Tipo</th><th>Produto</th><th>Sabor</th>
+            <th>Qtd</th><th>Preço Unit.</th><th>Receita</th><th>Custo</th>
+            <th>Lucro</th><th>Obs.</th><th>Ações</th>
+          </tr></thead>
+          <tbody id="hist-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════
+       PAGE: CADASTRO DE PRODUTOS
+  ══════════════════════════════ -->
+  <div class="page" id="page-cadastro">
+    <div class="page-header">
+      <h1>Cadastro de Produtos</h1>
+      <p>Crie novas categorias, modelos e sabores — ou adicione variações aos grupos existentes</p>
+    </div>
+
+    <!-- Tabs internas -->
+    <div style="display:flex;gap:4px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r3);padding:4px;width:fit-content;margin-bottom:24px" id="cad-tabs">
+      <button class="ptab active" id="cad-tab-novo" onclick="cadTab('novo',this)">✨ Novo Produto</button>
+      <button class="ptab" id="cad-tab-cat" onclick="cadTab('cat',this)">🗂️ Nova Categoria</button>
+      <button class="ptab" id="cad-tab-model" onclick="cadTab('model',this)">📦 Novo Modelo</button>
+      <button class="ptab" id="cad-tab-sabor" onclick="cadTab('sabor',this)">🌿 Novo Sabor</button>
+      <button class="ptab" id="cad-tab-list" onclick="cadTab('list',this)">📋 Catálogo Completo</button>
+    </div>
+
+    <!-- ── SUB: NOVO PRODUTO COMPLETO ── -->
+    <div id="cad-panel-novo">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start">
+        <div class="chart-card">
+          <div class="chart-title" style="margin-bottom:4px">➕ Cadastrar Produto Completo</div>
+          <div class="chart-sub" style="margin-bottom:20px">Preencha todos os campos para adicionar um novo SKU ao estoque</div>
+
+          <div class="form-group">
+            <label class="form-label">Categoria / Grupo</label>
+            <div style="display:flex;gap:8px">
+              <select class="form-control" id="np-cat" onchange="npCatChange()" style="flex:1">
+                <option value="">Selecione ou crie...</option>
+              </select>
+              <button class="btn btn-ghost" onclick="cadTab('cat', document.getElementById('cad-tab-cat'))" title="Criar nova categoria">＋ Nova</button>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Modelo</label>
+            <div style="display:flex;gap:8px">
+              <select class="form-control" id="np-model" onchange="npModelChange()" style="flex:1">
+                <option value="">— selecione categoria primeiro —</option>
+              </select>
+              <button class="btn btn-ghost" onclick="cadTab('model', document.getElementById('cad-tab-model'))" title="Criar novo modelo">＋ Novo</button>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Sabor / Variação</label>
+            <input type="text" class="form-control" id="np-sabor" placeholder="ex: Strawberry Ice, 35mg, Azul..." oninput="npCheckDuplicate()">
+            <div id="np-dup-warn" style="display:none;color:var(--orange);font-size:11px;margin-top:5px">⚠️ Este sabor já existe neste modelo</div>
+          </div>
+          <div class="form-row-3">
+            <div class="form-group">
+              <label class="form-label">Preço de Venda (R$)</label>
+              <input type="number" class="form-control" id="np-preco" step="0.01" placeholder="0,00" oninput="npCalc()">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Custo Unitário (R$)</label>
+              <input type="number" class="form-control" id="np-custo" step="0.01" placeholder="0,00" oninput="npCalc()">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Qtd Inicial</label>
+              <input type="number" class="form-control" id="np-qty" min="0" value="0" oninput="npCalc()">
+            </div>
+          </div>
+
+          <!-- Calc preview -->
+          <div class="calc-box">
+            <div class="calc-row">
+              <span class="calc-label">Margem de Lucro</span>
+              <span class="calc-val" style="color:var(--green)" id="np-c-margem">—</span>
+            </div>
+            <div class="calc-divider"></div>
+            <div class="calc-row">
+              <span class="calc-label">Valor Total em Estoque</span>
+              <span class="calc-val" style="color:var(--blue)" id="np-c-valor">R$ 0,00</span>
+            </div>
+            <div class="calc-row">
+              <span class="calc-label">Lucro Potencial (se vender tudo)</span>
+              <span class="calc-val" style="color:var(--green)" id="np-c-lucro">R$ 0,00</span>
+            </div>
+          </div>
+
+          <button class="btn btn-primary btn-full btn-lg" onclick="doNewProduct()">✓ Adicionar ao Catálogo e Estoque</button>
+        </div>
+
+        <!-- Dica + prévia -->
+        <div style="display:flex;flex-direction:column;gap:14px">
+          <div class="chart-card" style="border-color:rgba(79,156,249,.2)">
+            <div class="chart-title" style="margin-bottom:12px;color:var(--blue)">💡 Como funciona</div>
+            <div style="font-size:12px;color:var(--muted2);line-height:1.8">
+              <div style="margin-bottom:8px">• <strong style="color:var(--text)">Categoria</strong> = grupo principal (ex: PODS DESCARTÁVEIS)</div>
+              <div style="margin-bottom:8px">• <strong style="color:var(--text)">Modelo</strong> = linha do produto (ex: V400, Elfbar 30k)</div>
+              <div style="margin-bottom:8px">• <strong style="color:var(--text)">Sabor</strong> = variação específica (ex: Strawberry Ice)</div>
+              <div style="margin-bottom:8px">• O produto aparecerá automaticamente no <strong style="color:var(--text)">Estoque</strong>, <strong style="color:var(--text)">Registrar Venda</strong> e nos <strong style="color:var(--text)">Gráficos</strong></div>
+              <div>• Você pode alterar preço, custo e quantidade a qualquer momento via <strong style="color:var(--text)">✏️ Ajustar</strong> no Estoque</div>
+            </div>
+          </div>
+          <div class="chart-card" id="np-preview" style="display:none">
+            <div class="chart-title" style="margin-bottom:12px">👁️ Prévia do Produto</div>
+            <div id="np-preview-body"></div>
+          </div>
+          <!-- Estatísticas rápidas -->
+          <div class="chart-card">
+            <div class="chart-title" style="margin-bottom:12px">📊 Catálogo Atual</div>
+            <div id="cad-stats"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── SUB: NOVA CATEGORIA ── -->
+    <div id="cad-panel-cat" style="display:none">
+      <div style="max-width:560px">
+        <div class="chart-card">
+          <div class="chart-title" style="margin-bottom:4px">🗂️ Criar Nova Categoria</div>
+          <div class="chart-sub" style="margin-bottom:20px">Adicione um novo grupo principal ao catálogo</div>
+          <div class="form-group">
+            <label class="form-label">Nome da Categoria</label>
+            <input type="text" class="form-control" id="nc-nome" placeholder="ex: ACESSÓRIOS, MODS, KITS...">
+            <div style="font-size:11px;color:var(--muted);margin-top:5px">Será convertido para MAIÚSCULAS automaticamente</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Descrição (opcional)</label>
+            <input type="text" class="form-control" id="nc-desc" placeholder="Breve descrição da categoria...">
+          </div>
+          <button class="btn btn-primary btn-full" onclick="doNewCategory()">✓ Criar Categoria</button>
+
+          <div style="margin-top:24px">
+            <div class="form-label" style="margin-bottom:12px">Categorias existentes</div>
+            <div id="nc-existing"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── SUB: NOVO MODELO ── -->
+    <div id="cad-panel-model" style="display:none">
+      <div style="max-width:560px">
+        <div class="chart-card">
+          <div class="chart-title" style="margin-bottom:4px">📦 Adicionar Novo Modelo</div>
+          <div class="chart-sub" style="margin-bottom:20px">Adicione um novo modelo a uma categoria existente</div>
+          <div class="form-group">
+            <label class="form-label">Categoria de Destino</label>
+            <select class="form-control" id="nm-cat" onchange="nmRefreshModels()">
+              <option value="">Selecione...</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Nome do Novo Modelo</label>
+            <input type="text" class="form-control" id="nm-nome" placeholder="ex: V600, Geekbar 40k, Nikbar Pro...">
+          </div>
+          <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r3);padding:14px;margin-bottom:14px;font-size:12px;color:var(--muted2)">
+            💡 Após criar o modelo, adicione sabores/variações pelo painel <strong style="color:var(--text)">Novo Sabor</strong> ou <strong style="color:var(--text)">Novo Produto</strong>
+          </div>
+          <button class="btn btn-primary btn-full" onclick="doNewModel()">✓ Criar Modelo</button>
+
+          <div style="margin-top:24px">
+            <div class="form-label" style="margin-bottom:10px">Modelos na categoria selecionada</div>
+            <div id="nm-existing"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── SUB: NOVO SABOR ── -->
+    <div id="cad-panel-sabor" style="display:none">
+      <div style="max-width:560px">
+        <div class="chart-card">
+          <div class="chart-title" style="margin-bottom:4px">🌿 Adicionar Novo Sabor / Variação</div>
+          <div class="chart-sub" style="margin-bottom:20px">Adicione uma nova variação a um modelo já existente</div>
+          <div class="form-group">
+            <label class="form-label">Categoria</label>
+            <select class="form-control" id="ns-cat" onchange="nsUpdateModels()">
+              <option value="">Selecione...</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Modelo</label>
+            <select class="form-control" id="ns-model" onchange="nsRefreshFlavors()">
+              <option value="">— selecione categoria —</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Nome do Sabor / Variação</label>
+            <input type="text" class="form-control" id="ns-nome" placeholder="ex: Mango Ice, 50mg, Edição Limitada...">
+            <div id="ns-dup-warn" style="display:none;color:var(--orange);font-size:11px;margin-top:5px">⚠️ Este sabor já existe neste modelo</div>
+          </div>
+          <div class="form-row-3">
+            <div class="form-group">
+              <label class="form-label">Preço Venda (R$)</label>
+              <input type="number" class="form-control" id="ns-preco" step="0.01" placeholder="0,00">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Custo Unit. (R$)</label>
+              <input type="number" class="form-control" id="ns-custo" step="0.01" placeholder="0,00">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Qtd Inicial</label>
+              <input type="number" class="form-control" id="ns-qty" min="0" value="0">
+            </div>
+          </div>
+          <button class="btn btn-primary btn-full" onclick="doNewSabor()">✓ Adicionar Sabor ao Estoque</button>
+
+          <div style="margin-top:20px">
+            <div class="form-label" style="margin-bottom:10px">Sabores existentes neste modelo</div>
+            <div id="ns-existing"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── SUB: CATÁLOGO COMPLETO ── -->
+    <div id="cad-panel-list" style="display:none">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap">
+        <div class="search-wrap">
+          <input class="form-control" id="cat-list-search" placeholder="Buscar produto..." style="width:220px;font-size:12px" oninput="renderCatalog()">
+        </div>
+        <select class="form-control" id="cat-list-filter" style="width:200px;font-size:12px" onchange="renderCatalog()">
+          <option value="">Todas as categorias</option>
+        </select>
+        <span style="font-size:12px;color:var(--muted)" id="cat-list-count"></span>
+      </div>
+      <div class="chart-card">
+        <div class="table-wrap">
+          <table>
+            <thead><tr>
+              <th>Categoria</th><th>Modelo</th><th>Sabor / Variação</th>
+              <th>Qtd</th><th>Preço Venda</th><th>Custo Unit.</th>
+              <th>Margem</th><th>Status</th><th>Ações</th>
+            </tr></thead>
+            <tbody id="cat-list-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /page-cadastro -->
+
+</div><!-- /main-wrap -->
+
+<!-- ═══ MODAL: ADICIONAR ESTOQUE ═══ -->
+<div class="overlay" id="modal-addstock" onclick="closeModal('modal-addstock',event)">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">📥 Adicionar Estoque</div>
+      <button class="modal-close" onclick="closeModal('modal-addstock')">✕</button>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Categoria</label>
+      <select class="form-control" id="as-cat" onchange="asUpdateModels()">
+        <option value="">Selecione...</option>
+        <option>PODS DESCARTÁVEIS</option>
+        <option>PODS RECARREGÁVEIS</option>
+        <option>RESISTÊNCIAS</option>
+        <option>ESSÊNCIAS</option>
+        <option>CHICLETE SLAPPLE</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Modelo</label>
+      <select class="form-control" id="as-model" onchange="asUpdateFlavors()">
+        <option value="">— selecione categoria —</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Sabor / Variação</label>
+      <select class="form-control" id="as-flavor">
+        <option value="">— selecione modelo —</option>
+      </select>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Qtd a Adicionar</label>
+        <input type="number" class="form-control" id="as-qty" min="1" value="1">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Custo Unit. (R$)</label>
+        <input type="number" class="form-control" id="as-cost" step="0.01" placeholder="Opcional — atualiza custo">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Observação</label>
+      <input type="text" class="form-control" id="as-obs" placeholder="ex: reposição fornecedor...">
+    </div>
+    <div class="calc-box">
+      <div class="calc-row">
+        <span class="calc-label">Estoque atual</span>
+        <span class="calc-val" style="color:var(--orange)" id="as-cur">—</span>
+      </div>
+      <div class="calc-row">
+        <span class="calc-label">Após entrada</span>
+        <span class="calc-val" style="color:var(--green)" id="as-after">—</span>
+      </div>
+    </div>
+    <button class="btn btn-green btn-full btn-lg" onclick="doAddStock()">✓ Confirmar Entrada de Estoque</button>
+  </div>
+</div>
+
+<!-- ═══ MODAL: EDITAR QTD ═══ -->
+<div class="overlay" id="modal-edit" onclick="closeModal('modal-edit',event)">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">🔧 Ajustar Estoque</div>
+      <button class="modal-close" onclick="closeModal('modal-edit')">✕</button>
+    </div>
+    <div id="edit-product-info" style="background:var(--surface);border-radius:var(--r3);padding:12px;margin-bottom:16px;font-size:13px"></div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Nova Quantidade</label>
+        <input type="number" class="form-control" id="edit-qty" min="0">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Novo Preço Venda (R$)</label>
+        <input type="number" class="form-control" id="edit-price" step="0.01">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Novo Custo Unit. (R$)</label>
+        <input type="number" class="form-control" id="edit-cost" step="0.01">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Motivo do Ajuste</label>
+        <input type="text" class="form-control" id="edit-obs" placeholder="ex: inventário físico...">
+      </div>
+    </div>
+    <button class="btn btn-primary btn-full" onclick="doEdit()" style="margin-top:4px">✓ Salvar Ajuste</button>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- FAB -->
+<button class="fab" onclick="goPage('vendas')" title="Nova Venda">🛒</button>
+
+<script>
+// ════════════════════════════════════════
+//  DATA — INITIAL STOCK
+// ════════════════════════════════════════
+const INIT_STOCK = [
+  {g:"PODS DESCARTÁVEIS",m:"V250",s:"Strawberry Ice",q:5,p:140,c:62},
+  {g:"PODS DESCARTÁVEIS",m:"V250",s:"Grape Ice",q:7,p:140,c:62},
+  {g:"PODS DESCARTÁVEIS",m:"V250",s:"Strawberry Banana",q:1,p:140,c:62},
+  {g:"PODS DESCARTÁVEIS",m:"V250",s:"Icy Mint",q:7,p:140,c:62},
+  {g:"PODS DESCARTÁVEIS",m:"V250",s:"Banana Ice",q:2,p:140,c:62},
+  {g:"PODS DESCARTÁVEIS",m:"V250",s:"Green Apple",q:5,p:140,c:62},
+  {g:"PODS DESCARTÁVEIS",m:"V250",s:"Watermelon",q:3,p:140,c:62},
+  {g:"PODS DESCARTÁVEIS",m:"V250",s:"Blueberry",q:5,p:140,c:62},
+  {g:"PODS DESCARTÁVEIS",m:"V250",s:"Strawberry Kiwi",q:1,p:140,c:62},
+  {g:"PODS DESCARTÁVEIS",m:"V250",s:"Menthol",q:5,p:140,c:62},
+  {g:"PODS DESCARTÁVEIS",m:"V250",s:"Pineapple",q:6,p:140,c:62},
+  {g:"PODS DESCARTÁVEIS",m:"V300",s:"Grape Ice",q:4,p:160,c:70},
+  {g:"PODS DESCARTÁVEIS",m:"V300",s:"Pineapple",q:2,p:160,c:70},
+  {g:"PODS DESCARTÁVEIS",m:"V300",s:"Strawberry Banana",q:5,p:160,c:70},
+  {g:"PODS DESCARTÁVEIS",m:"V300",s:"Strawberry Ice",q:5,p:160,c:70},
+  {g:"PODS DESCARTÁVEIS",m:"V300",s:"Menthol",q:6,p:160,c:70},
+  {g:"PODS DESCARTÁVEIS",m:"V300",s:"Icy Mint",q:4,p:160,c:70},
+  {g:"PODS DESCARTÁVEIS",m:"V300",s:"Strawberry Kiwi",q:0,p:160,c:70},
+  {g:"PODS DESCARTÁVEIS",m:"V300",s:"Blueberry Ice",q:4,p:160,c:70},
+  {g:"PODS DESCARTÁVEIS",m:"V155",s:"Green Apple",q:1,p:130,c:55},
+  {g:"PODS DESCARTÁVEIS",m:"V155",s:"Pineapple",q:0,p:130,c:55},
+  {g:"PODS DESCARTÁVEIS",m:"V155",s:"Grape Ice",q:1,p:130,c:55},
+  {g:"PODS DESCARTÁVEIS",m:"V155",s:"Strawberry Banana",q:2,p:130,c:55},
+  {g:"PODS DESCARTÁVEIS",m:"V155",s:"Strawberry Kiwi",q:7,p:130,c:55},
+  {g:"PODS DESCARTÁVEIS",m:"V155",s:"Strawberry Ice",q:4,p:130,c:55},
+  {g:"PODS DESCARTÁVEIS",m:"V155",s:"Icy Mint",q:2,p:130,c:55},
+  {g:"PODS DESCARTÁVEIS",m:"V155",s:"Kiwi Passion Fruit",q:2,p:130,c:55},
+  {g:"PODS DESCARTÁVEIS",m:"V155",s:"Blueberry",q:1,p:130,c:55},
+  {g:"PODS DESCARTÁVEIS",m:"V155",s:"Menthol",q:5,p:130,c:55},
+  {g:"PODS DESCARTÁVEIS",m:"V155",s:"Pineapple Ice",q:5,p:130,c:55},
+  {g:"PODS DESCARTÁVEIS",m:"V155",s:"Strawberry Watermelon",q:4,p:130,c:55},
+  {g:"PODS DESCARTÁVEIS",m:"V150",s:"Green Apple Peach Kiwi",q:1,p:120,c:52},
+  {g:"PODS DESCARTÁVEIS",m:"V150",s:"Icy Mint",q:0,p:120,c:52},
+  {g:"PODS DESCARTÁVEIS",m:"V150",s:"Berry Blast",q:2,p:120,c:52},
+  {g:"PODS DESCARTÁVEIS",m:"V150",s:"Watermelon Ice",q:5,p:120,c:52},
+  {g:"PODS DESCARTÁVEIS",m:"V150",s:"Cherry Ice",q:3,p:120,c:52},
+  {g:"PODS DESCARTÁVEIS",m:"V150",s:"Dragonfruit Lemonade",q:2,p:120,c:52},
+  {g:"PODS DESCARTÁVEIS",m:"V150",s:"Cherry Watermelon",q:6,p:120,c:52},
+  {g:"PODS DESCARTÁVEIS",m:"V150",s:"Green Apple",q:2,p:120,c:52},
+  {g:"PODS DESCARTÁVEIS",m:"V150",s:"Strawberry Apple Watermelon",q:1,p:120,c:52},
+  {g:"PODS DESCARTÁVEIS",m:"V150",s:"Strawberry Kiwi",q:1,p:120,c:52},
+  {g:"PODS DESCARTÁVEIS",m:"V150",s:"Strawberry Ice",q:1,p:120,c:52},
+  {g:"PODS DESCARTÁVEIS",m:"V150",s:"Cherry Banana",q:5,p:120,c:52},
+  {g:"PODS DESCARTÁVEIS",m:"V150",s:"Menthol",q:1,p:120,c:52},
+  {g:"PODS DESCARTÁVEIS",m:"V150",s:"Lemon Ice",q:3,p:120,c:52},
+  {g:"PODS DESCARTÁVEIS",m:"V150",s:"Grape Ice",q:2,p:120,c:52},
+  {g:"PODS DESCARTÁVEIS",m:"V80",s:"Menthol",q:6,p:110,c:50},
+  {g:"PODS DESCARTÁVEIS",m:"V80",s:"Blueberry Lemon",q:4,p:110,c:50},
+  {g:"PODS DESCARTÁVEIS",m:"V80",s:"Blueberry Ice",q:4,p:110,c:50},
+  {g:"PODS DESCARTÁVEIS",m:"V80",s:"Green Apple",q:8,p:110,c:50},
+  {g:"PODS DESCARTÁVEIS",m:"V80",s:"Watermelon Ice",q:5,p:110,c:50},
+  {g:"PODS DESCARTÁVEIS",m:"V80",s:"Strawberry Ice",q:5,p:110,c:50},
+  {g:"PODS DESCARTÁVEIS",m:"V80",s:"Strawberry Kiwi",q:9,p:110,c:50},
+  {g:"PODS DESCARTÁVEIS",m:"V80",s:"Icy Mint",q:5,p:110,c:50},
+  {g:"PODS DESCARTÁVEIS",m:"V80",s:"Banana Cherry",q:2,p:110,c:50},
+  {g:"PODS DESCARTÁVEIS",m:"V80",s:"Grape Ice",q:5,p:110,c:50},
+  {g:"PODS DESCARTÁVEIS",m:"V80",s:"Spearmint Gum",q:3,p:110,c:50},
+  {g:"PODS DESCARTÁVEIS",m:"V80",s:"Lime Mango",q:4,p:110,c:50},
+  {g:"PODS DESCARTÁVEIS",m:"V80",s:"Passion Fruit Sour Kiwi",q:5,p:110,c:50},
+  {g:"PODS DESCARTÁVEIS",m:"V400",s:"Mint",q:6,p:165,c:70},
+  {g:"PODS DESCARTÁVEIS",m:"V400",s:"Grape",q:6,p:165,c:70},
+  {g:"PODS DESCARTÁVEIS",m:"V400",s:"Menthol",q:5,p:165,c:70},
+  {g:"PODS DESCARTÁVEIS",m:"V400",s:"Blueberry",q:8,p:165,c:70},
+  {g:"PODS DESCARTÁVEIS",m:"V400",s:"Grape Peach",q:6,p:165,c:70},
+  {g:"PODS DESCARTÁVEIS",m:"V400",s:"Strawberry Watermelon",q:4,p:165,c:70},
+  {g:"PODS DESCARTÁVEIS",m:"V400",s:"Pineapple",q:5,p:165,c:70},
+  {g:"PODS DESCARTÁVEIS",m:"V400",s:"Strawberry Banana",q:4,p:165,c:70},
+  {g:"PODS DESCARTÁVEIS",m:"V400",s:"Strawberry Kiwi",q:4,p:165,c:70},
+  {g:"PODS DESCARTÁVEIS",m:"V400",s:"Watermelon Ice",q:5,p:165,c:70},
+  {g:"PODS DESCARTÁVEIS",m:"V-Mix",s:"Grape Ice / Watermelon Ice",q:5,p:170,c:75},
+  {g:"PODS DESCARTÁVEIS",m:"V-Mix",s:"Apple Ice / Strawberry Watermelon",q:4,p:170,c:75},
+  {g:"PODS DESCARTÁVEIS",m:"V-Mix",s:"Grape Ice / Strawberry",q:3,p:170,c:75},
+  {g:"PODS DESCARTÁVEIS",m:"V-Mix",s:"Banana Ice / Strawberry Ice",q:0,p:170,c:75},
+  {g:"PODS DESCARTÁVEIS",m:"V-Mix",s:"Watermelon Ice / Cherry Ice",q:3,p:170,c:75},
+  {g:"PODS DESCARTÁVEIS",m:"P100",s:"Baterias",q:3,p:100,c:42},
+  {g:"PODS DESCARTÁVEIS",m:"P100",s:"Blueberry",q:9,p:100,c:42},
+  {g:"PODS DESCARTÁVEIS",m:"P100",s:"Grape Ice",q:6,p:100,c:42},
+  {g:"PODS DESCARTÁVEIS",m:"P100",s:"Strawberry Kiwi",q:5,p:100,c:42},
+  {g:"PODS DESCARTÁVEIS",m:"P100",s:"Green Apple",q:7,p:100,c:42},
+  {g:"PODS DESCARTÁVEIS",m:"P100",s:"Banana",q:6,p:100,c:42},
+  {g:"PODS DESCARTÁVEIS",m:"P100",s:"Watermelon",q:4,p:100,c:42},
+  {g:"PODS DESCARTÁVEIS",m:"P100",s:"Pineapple",q:1,p:100,c:42},
+  {g:"PODS DESCARTÁVEIS",m:"P100",s:"Strawberry Ice",q:1,p:100,c:42},
+  {g:"PODS DESCARTÁVEIS",m:"Nikbar 10k",s:"Menthol",q:1,p:80,c:36},
+  {g:"PODS DESCARTÁVEIS",m:"Nikbar 10k",s:"Pineapple",q:1,p:80,c:36},
+  {g:"PODS DESCARTÁVEIS",m:"Nikbar 10k",s:"Sakura Grape",q:1,p:80,c:36},
+  {g:"PODS DESCARTÁVEIS",m:"Nikbar 10k",s:"Icy Mint",q:10,p:80,c:36},
+  {g:"PODS DESCARTÁVEIS",m:"Nikbar 10k",s:"Strawberry Ice",q:5,p:80,c:36},
+  {g:"PODS DESCARTÁVEIS",m:"Nikbar 10k",s:"Strawberry Banana",q:3,p:80,c:36},
+  {g:"PODS DESCARTÁVEIS",m:"Nikbar 10k",s:"Blueberry Ice",q:2,p:80,c:36},
+  {g:"PODS DESCARTÁVEIS",m:"Nikbar 10k",s:"Strawberry Kiwi",q:4,p:80,c:36},
+  {g:"PODS DESCARTÁVEIS",m:"Elfbar 30k",s:"Watermelon Ice",q:5,p:140,c:60},
+  {g:"PODS DESCARTÁVEIS",m:"Elfbar 30k",s:"Spearmint",q:2,p:140,c:60},
+  {g:"PODS DESCARTÁVEIS",m:"Elfbar 30k",s:"Bubaloo Grape",q:3,p:140,c:60},
+  {g:"PODS DESCARTÁVEIS",m:"Elfbar 30k",s:"Strawberry Ice",q:10,p:140,c:60},
+  {g:"PODS DESCARTÁVEIS",m:"Elfbar 30k",s:"Green Apple",q:5,p:140,c:60},
+  {g:"PODS DESCARTÁVEIS",m:"Elfbar 30k",s:"Menthol",q:3,p:140,c:60},
+  {g:"PODS DESCARTÁVEIS",m:"Elfbar 15k",s:"Kiwi Watermelon Apple",q:7,p:100,c:43},
+  {g:"PODS DESCARTÁVEIS",m:"Elfbar 15k",s:"Sour Apple Ice",q:6,p:100,c:43},
+  {g:"PODS DESCARTÁVEIS",m:"Elfbar 15k",s:"Strawberry Kiwi",q:5,p:100,c:43},
+  {g:"PODS DESCARTÁVEIS",m:"Elfbar 15k",s:"Peach Mango Watermelon",q:1,p:100,c:43},
+  {g:"PODS DESCARTÁVEIS",m:"Elfbar 15k",s:"Miami Mint",q:1,p:100,c:43},
+  {g:"PODS DESCARTÁVEIS",m:"Elfbar 15k",s:"Strawberry Ice",q:1,p:100,c:43},
+  {g:"PODS DESCARTÁVEIS",m:"Geekbar 25k",s:"Bluerazz Ice",q:4,p:100,c:50},
+  {g:"PODS DESCARTÁVEIS",m:"Geekbar 25k",s:"Miami Mint",q:4,p:100,c:50},
+  {g:"PODS DESCARTÁVEIS",m:"Oxbar 25k",s:"Mix Berries",q:1,p:110,c:44},
+  {g:"PODS DESCARTÁVEIS",m:"Oxbar 25k",s:"Watermelon Slushie",q:3,p:110,c:44},
+  {g:"PODS DESCARTÁVEIS",m:"Oxbar 25k",s:"Strawberry Bubblegum",q:4,p:110,c:44},
+  {g:"PODS DESCARTÁVEIS",m:"Oxbar 25k",s:"Blueberry Raspberry",q:2,p:110,c:44},
+  {g:"PODS DESCARTÁVEIS",m:"Nikbar 25k",s:"Tripple Berry Ice",q:2,p:100,c:50},
+  {g:"PODS DESCARTÁVEIS",m:"Nikbar 30k",s:"Strawberry Apple Watermelon",q:2,p:115,c:46},
+  {g:"PODS DESCARTÁVEIS",m:"Nikbar 30k",s:"Strawberry Ice",q:4,p:115,c:46},
+  {g:"PODS DESCARTÁVEIS",m:"Nikbar 30k",s:"Cherry Banana",q:4,p:115,c:46},
+  {g:"PODS DESCARTÁVEIS",m:"Nikbar 30k",s:"Menthol",q:2,p:115,c:46},
+  {g:"PODS DESCARTÁVEIS",m:"Nikbar 30k",s:"Watermelon Cherry",q:1,p:115,c:46},
+  {g:"PODS DESCARTÁVEIS",m:"The Blacksheep 40k",s:"Grape / Menthol",q:2,p:170,c:80},
+  {g:"PODS DESCARTÁVEIS",m:"The Blacksheep 40k",s:"Strawberry Kiwi / Fresh Mint",q:2,p:170,c:80},
+  {g:"PODS RECARREGÁVEIS",m:"Xros Mini",s:"—",q:14,p:170,c:66},
+  {g:"RESISTÊNCIAS",m:"Coil Xros 0.8",s:"—",q:33,p:30,c:15},
+  {g:"RESISTÊNCIAS",m:"Coil Xros 0.6",s:"—",q:44,p:30,c:15},
+  {g:"RESISTÊNCIAS",m:"Coil Renova Zero",s:"—",q:0,p:30,c:15},
+  {g:"ESSÊNCIAS",m:"Migo",s:"Apple Ice 35mg",q:3,p:50,c:22},
+  {g:"ESSÊNCIAS",m:"Migo",s:"Melãozin Brabo 35mg",q:1,p:50,c:22},
+  {g:"ESSÊNCIAS",m:"Migo",s:"Melãozin Brabo 50mg",q:2,p:50,c:22},
+  {g:"ESSÊNCIAS",m:"Migo",s:"BluBlu 20mg",q:1,p:50,c:22},
+  {g:"ESSÊNCIAS",m:"Migo",s:"BluBlu 35mg",q:2,p:50,c:22},
+  {g:"ESSÊNCIAS",m:"Migo",s:"BluBlu 50mg",q:2,p:50,c:22},
+  {g:"ESSÊNCIAS",m:"Migo",s:"Moranguim Kiwi 35mg",q:2,p:50,c:22},
+  {g:"ESSÊNCIAS",m:"Migo",s:"Moranguim Kiwi 50mg",q:1,p:50,c:22},
+  {g:"ESSÊNCIAS",m:"Migo",s:"Melancinha Boom 35mg",q:2,p:50,c:22},
+  {g:"ESSÊNCIAS",m:"Migo",s:"Manga Vibe 20mg",q:1,p:50,c:22},
+  {g:"ESSÊNCIAS",m:"Migo",s:"Manga Vibe 50mg",q:4,p:50,c:22},
+  {g:"ESSÊNCIAS",m:"Migo",s:"Uvinha Braba 35mg",q:0,p:50,c:22},
+  {g:"ESSÊNCIAS",m:"Migo",s:"Uvinha Braba 50mg",q:2,p:50,c:22},
+  {g:"ESSÊNCIAS",m:"Migo",s:"Tangerina 50mg",q:2,p:50,c:22},
+  {g:"ESSÊNCIAS",m:"Migo",s:"Frambo Fresh 35mg",q:3,p:50,c:22},
+  {g:"ESSÊNCIAS",m:"Migo",s:"Frambo Fresh 50mg",q:3,p:50,c:22},
+  {g:"ESSÊNCIAS",m:"Migo",s:"Morangou 20mg",q:2,p:50,c:22},
+  {g:"ESSÊNCIAS",m:"Migo",s:"Morangou 50mg",q:1,p:50,c:22},
+  {g:"ESSÊNCIAS",m:"Migo",s:"Menta Antártida 35mg",q:6,p:50,c:22},
+  {g:"ESSÊNCIAS",m:"Migo",s:"Menta Antártida 50mg",q:4,p:50,c:22},
+  {g:"ESSÊNCIAS",m:"Ignite",s:"Mango Grape Apple Pops",q:3,p:90,c:25},
+  {g:"ESSÊNCIAS",m:"Ignite",s:"Berry Banana Sundae",q:4,p:90,c:25},
+  {g:"ESSÊNCIAS",m:"Ignite",s:"Strawberry Frost",q:3,p:90,c:25},
+  {g:"ESSÊNCIAS",m:"Ignite",s:"Banana Freeze",q:4,p:90,c:25},
+  {g:"ESSÊNCIAS",m:"Ignite",s:"Grape Passion Slush",q:3,p:90,c:25},
+  {g:"ESSÊNCIAS",m:"Ignite",s:"Mango Passion Breeze",q:6,p:90,c:25},
+  {g:"ESSÊNCIAS",m:"Ignite",s:"Berry Kiwi Blast",q:3,p:90,c:25},
+  {g:"ESSÊNCIAS",m:"Ignite",s:"Arctic Grape",q:1,p:90,c:25},
+  {g:"ESSÊNCIAS",m:"Ignite",s:"Berry Lemonade Chill",q:3,p:90,c:25},
+  {g:"ESSÊNCIAS",m:"Ignite",s:"Green Apple Blizzard",q:5,p:90,c:25},
+  {g:"ESSÊNCIAS",m:"BLVK",s:"Original Bubblegum 35mg",q:1,p:85,c:50},
+  {g:"ESSÊNCIAS",m:"BLVK",s:"Grape Soda 35mg",q:2,p:85,c:50},
+  {g:"ESSÊNCIAS",m:"BLVK",s:"Watermelon Menthol 35mg",q:1,p:85,c:50},
+  {g:"ESSÊNCIAS",m:"BLVK",s:"Watermelon Taffy 35mg",q:4,p:85,c:50},
+  {g:"ESSÊNCIAS",m:"BLVK",s:"Strawberry Banana Ice 35mg",q:2,p:85,c:50},
+  {g:"ESSÊNCIAS",m:"BLVK",s:"Strawberry Banana Ice 50mg",q:2,p:85,c:50},
+  {g:"ESSÊNCIAS",m:"BLVK",s:"Strawberry Lemonade 50mg",q:1,p:85,c:50},
+  {g:"ESSÊNCIAS",m:"BLVK",s:"Strawberry Peach 50mg",q:1,p:85,c:50},
+  {g:"ESSÊNCIAS",m:"Magna",s:"Grape Gum 20mg",q:4,p:65,c:30},
+  {g:"ESSÊNCIAS",m:"Hypnos",s:"Spearmint 20mg",q:10,p:65,c:30},
+  {g:"ESSÊNCIAS",m:"Hypnos",s:"Spearmint 35mg",q:1,p:65,c:30},
+  {g:"ESSÊNCIAS",m:"Hypnos",s:"Spearmint 50mg",q:2,p:65,c:30},
+  {g:"ESSÊNCIAS",m:"Hypnos",s:"Spearmint Strawberry 20mg",q:2,p:65,c:30},
+  {g:"ESSÊNCIAS",m:"Hypnos",s:"Spearmint Strawberry 35mg",q:1,p:65,c:30},
+  {g:"ESSÊNCIAS",m:"Hypnos",s:"Spearmint Strawberry 50mg",q:1,p:65,c:30},
+  {g:"ESSÊNCIAS",m:"Hypnos",s:"Spearmint Berries 35mg",q:1,p:65,c:30},
+  {g:"ESSÊNCIAS",m:"Hypnos",s:"Spearmint Berries 50mg",q:2,p:65,c:30},
+  {g:"ESSÊNCIAS",m:"Hypnos",s:"Spearmint Watermelon 20mg",q:2,p:65,c:30},
+  {g:"ESSÊNCIAS",m:"Hypnos",s:"Spearmint Watermelon 35mg",q:2,p:65,c:30},
+  {g:"ESSÊNCIAS",m:"Hypnos",s:"Spearmint Watermelon 50mg",q:2,p:65,c:30},
+  {g:"ESSÊNCIAS",m:"Hypnos",s:"Spearmint Apple 35mg",q:2,p:65,c:30},
+  {g:"ESSÊNCIAS",m:"Hypnos",s:"Spearmint Apple 50mg",q:1,p:65,c:30},
+  {g:"ESSÊNCIAS",m:"Hypnos",s:"Spearmint Cherry 35mg",q:0,p:65,c:30},
+  {g:"ESSÊNCIAS",m:"Hypnos",s:"Spearmint Cherry 50mg",q:2,p:65,c:30},
+  {g:"ESSÊNCIAS",m:"Hypnos",s:"Spearmint Sour 35mg",q:1,p:65,c:30},
+  {g:"ESSÊNCIAS",m:"Hypnos",s:"Spearmint Grape 35mg",q:2,p:65,c:30},
+  {g:"ESSÊNCIAS",m:"Hypnos",s:"Spearmint Grape 50mg",q:2,p:65,c:30},
+  {g:"ESSÊNCIAS",m:"Hypnos",s:"Spearmint Lime 35mg",q:2,p:65,c:30},
+  {g:"ESSÊNCIAS",m:"Hypnos",s:"Spearmint Lime 50mg",q:1,p:65,c:30},
+  {g:"CHICLETE SLAPPLE",m:"Slapple",s:"Watermelon 2mg",q:0,p:90,c:40},
+  {g:"CHICLETE SLAPPLE",m:"Slapple",s:"Apple 4mg",q:1,p:90,c:40},
+  {g:"CHICLETE SLAPPLE",m:"Slapple",s:"Pineapple 4mg",q:2,p:90,c:40},
+  {g:"CHICLETE SLAPPLE",m:"Slapple",s:"Peach 4mg",q:2,p:90,c:40},
+];
+
+// ════════════════════════════════════════
+//  SYNC — Google Sheets via Apps Script
+// ════════════════════════════════════════
+const SYNC_URL = 'https://script.google.com/macros/s/AKfycbx6ag8qYF4W7OHJykjcA2HlwlHPd52pGZs2kuaPav1REi5lPet7L3jyV0gPKOzZsK2Y/exec';
+
+// Verifica se a URL foi configurada
+function syncConfigured() {
+  return SYNC_URL && !SYNC_URL.startsWith('COLE_') && SYNC_URL.includes('script.google.com');
+}
+let syncTimer = null;
+let syncPending = false;
+let lastSyncTime = null;
+let syncOnline = true;
+
+function setSyncStatus(status, msg) {
+  const el = document.getElementById('sync-status');
+  if (!el) return;
+  const configs = {
+    syncing: { icon:'🔄', text: msg||'Sincronizando...', color:'var(--blue)',   bg:'var(--blue-dim)',   border:'rgba(79,156,249,.25)' },
+    ok:      { icon:'☁️',  text: msg||'Sincronizado',    color:'var(--green)',  bg:'var(--green-dim)',  border:'rgba(34,211,160,.25)' },
+    error:   { icon:'⚠️',  text: msg||'Offline',         color:'var(--orange)', bg:'var(--orange-dim)', border:'rgba(249,115,22,.25)'  },
+    pending: { icon:'⏳',  text: msg||'Aguardando...',   color:'var(--yellow)', bg:'var(--yellow-dim)', border:'rgba(251,191,36,.25)'  },
+  };
+  const c = configs[status] || configs.ok;
+  el.innerHTML = `<span style="font-size:13px">${c.icon}</span><span style="font-size:11px;font-weight:600;color:${c.color}">${c.text}</span>`;
+  el.style.background  = c.bg;
+  el.style.borderColor = c.border;
+}
+
+// Envia estado completo para o Google Sheets
+async function syncToCloud(immediate = false) {
+  if (!syncConfigured()) { setSyncStatus('error','URL não configurada'); return; }
+  if (!immediate) {
+    // Debounce: espera 2s sem novas mudanças para não sobrecarregar
+    clearTimeout(syncTimer);
+    syncTimer = setTimeout(() => syncToCloud(true), 2000);
+    setSyncStatus('pending');
+    return;
+  }
+  setSyncStatus('syncing');
+  try {
+    const payload = {
+      stock:      STATE.stock,
+      log:        STATE.log,
+      customCats: STATE.customCats || [],
+      updatedAt:  new Date().toISOString(),
+    };
+    const res = await fetch(SYNC_URL, {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    lastSyncTime = new Date();
+    syncOnline = true;
+    const h = lastSyncTime.getHours().toString().padStart(2,'0');
+    const m = lastSyncTime.getMinutes().toString().padStart(2,'0');
+    const s = lastSyncTime.getSeconds().toString().padStart(2,'0');
+    setSyncStatus('ok', `Salvo às ${h}:${m}:${s}`);
+  } catch(e) {
+    syncOnline = false;
+    setSyncStatus('error', 'Sem conexão — salvo local');
+    console.warn('Sync error:', e);
+  }
+}
+
+// Busca estado mais recente da nuvem
+async function syncFromCloud() {
+  if (!syncConfigured()) { setSyncStatus('error','Configure a URL do Apps Script'); return; }
+  setSyncStatus('syncing', 'Buscando dados...');
+  try {
+    const res = await fetch(SYNC_URL + '?t=' + Date.now());
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const text = await res.text();
+    if (!text || text === '{}' || text.trim() === '') {
+      // Nuvem vazia — sobe o estado local
+      setSyncStatus('ok', 'Nuvem vazia — enviando dados locais');
+      await syncToCloud(true);
+      return;
+    }
+    const cloud = JSON.parse(text);
+    if (!cloud.updatedAt) {
+      setSyncStatus('ok', 'Nuvem sem dados — usando local');
+      await syncToCloud(true);
+      return;
+    }
+    const cloudTime = new Date(cloud.updatedAt).getTime();
+    const localRaw  = localStorage.getItem('up_updated_at');
+    const localTime = localRaw ? new Date(localRaw).getTime() : 0;
+
+    if (cloudTime > localTime) {
+      // Nuvem é mais recente — puxa
+      STATE.stock      = cloud.stock      || STATE.stock;
+      STATE.log        = cloud.log        || STATE.log;
+      STATE.customCats = cloud.customCats || STATE.customCats;
+      saveStateLocal();
+      syncOnline = true;
+      setSyncStatus('ok', 'Dados atualizados da nuvem ☁️');
+      // Re-renderiza página atual
+      const activePage = document.querySelector('.page.active');
+      if (activePage) renderPage(activePage.id.replace('page-',''));
+      refreshAllCatSelects && refreshAllCatSelects();
+      updateBadge && updateBadge();
+    } else {
+      // Local é mais recente — sobe
+      syncOnline = true;
+      await syncToCloud(true);
+    }
+  } catch(e) {
+    syncOnline = false;
+    setSyncStatus('error', 'Offline — dados locais');
+    console.warn('Sync from cloud error:', e);
+  }
+}
+
+// Salva apenas no localStorage (sem mandar pra nuvem)
+function saveStateLocal() {
+  localStorage.setItem('up_stock',      JSON.stringify(STATE.stock));
+  localStorage.setItem('up_log',        JSON.stringify(STATE.log));
+  localStorage.setItem('up_cats',       JSON.stringify(STATE.customCats||[]));
+  localStorage.setItem('up_updated_at', new Date().toISOString());
+}
+
+// ════════════════════════════════════════
+//  STATE — localStorage + Cloud
+// ════════════════════════════════════════
+function loadState() {
+  return {
+    stock:      JSON.parse(localStorage.getItem('up_stock')  || 'null') || INIT_STOCK.map(p=>({...p})),
+    log:        JSON.parse(localStorage.getItem('up_log')    || '[]'),
+    customCats: JSON.parse(localStorage.getItem('up_cats')   || '[]'),
+  };
+}
+
+// saveState agora salva local E envia para nuvem com debounce
+function saveState() {
+  saveStateLocal();
+  syncToCloud(); // debounced — não bloqueia
+}
+
+let STATE = loadState();
+
+// ════════════════════════════════════════
+//  HELPERS
+// ════════════════════════════════════════
+const brl = v => 'R$\u00a0' + Number(v).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+const pct = v => Number(v).toFixed(1).replace('.',',') + '%';
+const today = () => {
+  const d = new Date();
+  return d.getFullYear() + '-' +
+    String(d.getMonth()+1).padStart(2,'0') + '-' +
+    String(d.getDate()).padStart(2,'0');
+};
+const nowStr = () => new Date().toLocaleString('pt-BR');
+const margem = (p,c) => p > 0 ? ((p-c)/p*100) : 0;
+
+// Extrai YYYY-MM-DD no fuso LOCAL de uma string ISO ou date
+function localDateStr(isoStr) {
+  const d = new Date(isoStr);
+  return d.getFullYear() + '-' +
+    String(d.getMonth()+1).padStart(2,'0') + '-' +
+    String(d.getDate()).padStart(2,'0');
+}
+
+function dateRange(days) {
+  if (!days) return null;
+  const d = new Date();
+  d.setDate(d.getDate() - days + 1);
+  return d.getFullYear() + '-' +
+    String(d.getMonth()+1).padStart(2,'0') + '-' +
+    String(d.getDate()).padStart(2,'0');
+}
+
+function periodLabel(p) {
+  const map = {dia:'Hoje',semana:'Esta Semana',mes:'Este Mês',tudo:'Todo Período'};
+  return map[p] || p;
+}
+
+function filterLogByPeriod(period) {
+  const now = new Date();
+  const todayStr = today();
+  return STATE.log.filter(l => {
+    if (l.tipo !== 'venda') return false;
+    const dStr = localDateStr(l.data);  // data LOCAL da venda
+    const d    = new Date(l.data);
+    if (period === 'dia') {
+      return dStr === todayStr;
+    } else if (period === 'semana') {
+      const start = new Date(now);
+      start.setDate(now.getDate() - now.getDay());
+      start.setHours(0,0,0,0);
+      return d >= start;
+    } else if (period === 'mes') {
+      return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+    }
+    return true;
+  });
+}
+
+// find stock index
+function findIdx(g,m,s) {
+  return STATE.stock.findIndex(x => x.g===g && x.m===m && x.s===s);
+}
+
+// ════════════════════════════════════════
+//  TOAST
+// ════════════════════════════════════════
+let toastTimer;
+function toast(msg, type='success') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show ' + type;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>{ t.className='toast'; },3200);
+}
+
+// ════════════════════════════════════════
+//  NAVIGATION
+// ════════════════════════════════════════
+const PAGES = ['overview','financeiro','vendas','estoque','historico','cadastro'];
+const TITLES = {overview:'Visão Geral',financeiro:'Financeiro',vendas:'Registrar Venda',estoque:'Gestão de Estoque',historico:'Histórico de Movimentos',cadastro:'Cadastro de Produtos'};
+
+function goPage(id) {
+  PAGES.forEach(p => {
+    document.getElementById('page-'+p)?.classList.remove('active');
+    const n = document.getElementById('nav-'+p);
+    if(n) n.classList.remove('active');
+  });
+  document.getElementById('page-'+id)?.classList.add('active');
+  const nav = document.getElementById('nav-'+id);
+  if(nav) nav.classList.add('active');
+  document.getElementById('topbar-title').textContent = TITLES[id] || id;
+  renderPage(id);
+}
+
+function renderPage(id) {
+  if (id==='overview')   renderOverview();
+  if (id==='financeiro') renderFinanceiro();
+  if (id==='vendas')     renderVendasPage();
+  if (id==='estoque')    renderEstoque();
+  if (id==='historico')  renderHistorico();
+  if (id==='cadastro')   renderCadastro();
+}
+
+// ════════════════════════════════════════
+//  CHART HELPERS
+// ════════════════════════════════════════
+const COLORS = ['#4f9cf9','#22d3a0','#f97316','#a78bfa','#fb7185','#fbbf24','#34d399','#60a5fa'];
+const CD = {
+  tooltip:{backgroundColor:'#11131d',borderColor:'rgba(255,255,255,0.07)',borderWidth:1,
+    titleColor:'#e8eaf0',bodyColor:'#6b7494',padding:12,cornerRadius:8,
+    titleFont:{family:'Syne',weight:'700',size:12},bodyFont:{family:'DM Sans',size:11}},
+  legend:{labels:{color:'#4e5670',font:{family:'DM Sans',size:11},boxWidth:9,padding:14}},
+  scales:{
+    x:{ticks:{color:'#4e5670',font:{family:'DM Sans',size:10}},grid:{color:'rgba(255,255,255,0.03)'},border:{color:'rgba(255,255,255,0.03)'}},
+    y:{ticks:{color:'#4e5670',font:{family:'DM Sans',size:10}},grid:{color:'rgba(255,255,255,0.03)'},border:{color:'rgba(255,255,255,0.03)'}}
+  }
+};
+
+function mkChart(id, cfg) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  if (el._ch) el._ch.destroy();
+  el._ch = new Chart(el, cfg);
+  return el._ch;
+}
+
+// ════════════════════════════════════════
+//  OVERVIEW PAGE
+// ════════════════════════════════════════
+function renderOverview() {
+  const stk = STATE.stock.filter(p=>!p._placeholder);
+  const totalVal  = stk.reduce((s,p)=>s+p.q*p.p, 0);
+  const totalCost = stk.reduce((s,p)=>s+p.q*p.c, 0);
+  const totalQtd  = stk.reduce((s,p)=>s+p.q, 0);
+  const totalLucro= totalVal - totalCost;
+  const avgM = totalVal > 0 ? totalLucro/totalVal*100 : 0;
+  const outCount = stk.filter(p=>p.q===0).length;
+  const lowCount = stk.filter(p=>p.q>0 && p.q<=2).length;
+
+  const todaySales = filterLogByPeriod('dia');
+  const todayRec  = todaySales.reduce((s,l)=>s+l.receita,0);
+  const todayLuc  = todaySales.reduce((s,l)=>s+l.lucro,0);
+  const todayQtd  = todaySales.reduce((s,l)=>s+l.qtd,0);
+  const todayOrds = todaySales.length;
+
+  // KPI estoque
+  document.getElementById('ov-kpis-estoque').innerHTML = `
+    <div class="kpi blue"><div class="kpi-glow"></div><div class="kpi-label">Valor em Estoque</div><div class="kpi-value">${brl(totalVal)}</div><span class="kpi-badge neu">${totalQtd} unidades</span></div>
+    <div class="kpi orange"><div class="kpi-glow"></div><div class="kpi-label">Custo do Estoque</div><div class="kpi-value">${brl(totalCost)}</div><span class="kpi-badge neu">${pct(totalCost/totalVal*100)} do valor</span></div>
+    <div class="kpi green"><div class="kpi-glow"></div><div class="kpi-label">Lucro Bruto Potencial</div><div class="kpi-value">${brl(totalLucro)}</div><span class="kpi-badge up">↑ ${pct(avgM)} margem</span></div>
+    <div class="kpi pink"><div class="kpi-glow"></div><div class="kpi-label">Produtos Zerados</div><div class="kpi-value">${outCount}</div><span class="kpi-badge down">⚠ ${lowCount} em nível baixo</span></div>
+    <div class="kpi purple"><div class="kpi-glow"></div><div class="kpi-label">Total de SKUs</div><div class="kpi-value">${stk.length}</div><span class="kpi-badge neu">5 categorias</span></div>
+  `;
+
+  // KPI hoje
+  document.getElementById('ov-kpis-hoje').innerHTML = `
+    <div class="kpi blue"><div class="kpi-glow"></div><div class="kpi-label">Receita Hoje</div><div class="kpi-value">${brl(todayRec)}</div><span class="kpi-badge ${todayOrds>0?'up':'neu'}">${todayOrds} venda${todayOrds!==1?'s':''}</span></div>
+    <div class="kpi green"><div class="kpi-glow"></div><div class="kpi-label">Lucro Hoje</div><div class="kpi-value">${brl(todayLuc)}</div><span class="kpi-badge ${todayLuc>0?'up':'neu'}">${todayRec>0?pct(todayLuc/todayRec*100):'—'} margem</span></div>
+    <div class="kpi purple"><div class="kpi-glow"></div><div class="kpi-label">Itens Vendidos Hoje</div><div class="kpi-value">${todayQtd}</div><span class="kpi-badge neu">unidades</span></div>
+    <div class="kpi yellow"><div class="kpi-glow"></div><div class="kpi-label">Ticket Médio Hoje</div><div class="kpi-value">${todayOrds>0?brl(todayRec/todayOrds):'—'}</div><span class="kpi-badge neu">por venda</span></div>
+  `;
+
+  // Alerts
+  const alerts = stk.filter(p=>p.q<=2).sort((a,b)=>a.q-b.q).slice(0,8);
+  const alertsEl = document.getElementById('alerts-feed');
+  alertsEl.innerHTML = alerts.length ? alerts.map(p=>`
+    <div class="feed-item">
+      <div class="feed-dot" style="background:${p.q===0?'var(--pink)':'var(--orange)'}"></div>
+      <div class="feed-body">
+        <div class="feed-title">${p.m} — ${p.s}</div>
+        <div class="feed-sub">${p.g}</div>
+      </div>
+      <div class="feed-val" style="color:${p.q===0?'var(--pink)':'var(--orange)'}">${p.q} un.</div>
+    </div>
+  `).join('') : '<div class="empty"><div class="ei">✅</div>Nenhum produto crítico!</div>';
+
+  // Activity feed
+  const acts = [...STATE.log].reverse().slice(0,8);
+  const actEl = document.getElementById('activity-feed');
+  actEl.innerHTML = acts.length ? acts.map(l=>`
+    <div class="feed-item">
+      <div class="feed-dot" style="background:${l.tipo==='venda'?'var(--blue)':l.tipo==='entrada'?'var(--green)':'var(--purple)'}"></div>
+      <div class="feed-body">
+        <div class="feed-title">${l.tipo==='venda'?'🛒':'📥'} ${l.modelo} ${l.sabor!=='—'?'— '+l.sabor:''}</div>
+        <div class="feed-sub">${l.tipo==='venda'?'Venda':'Entrada'} · ${l.data.slice(0,16).replace('T',' ')}</div>
+      </div>
+      <div class="feed-val" style="color:${l.tipo==='venda'?'var(--blue)':'var(--green)'}">${l.tipo==='venda'?brl(l.receita):'+'+l.qtd+' un.'}</div>
+    </div>
+  `).join('') : '<div class="empty"><div class="ei">📋</div>Sem atividade ainda</div>';
+
+  // Charts
+  ovCatChart();
+  ovTopValChart();
+  ovReceitaChart(7);
+  ovDecompChart();
+
+  document.getElementById('ov-subtitle').textContent =
+    'Atualizado em ' + new Date().toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric'});
+}
+
+function ovCatChart() {
+  const groups = {};
+  STATE.stock.filter(p=>!p._placeholder).forEach(p=>{ groups[p.g]=(groups[p.g]||0)+p.q*p.p; });
+  const lbls = Object.keys(groups); const data = Object.values(groups);
+  mkChart('c-ov-cat',{type:'doughnut',data:{labels:lbls,datasets:[{data,backgroundColor:COLORS,borderColor:'#11131d',borderWidth:3,hoverOffset:7}]},
+    options:{responsive:true,maintainAspectRatio:false,cutout:'68%',
+      plugins:{...CD,tooltip:{...CD.tooltip,callbacks:{label:ctx=>` ${ctx.label}: ${brl(ctx.raw)}`}}}}});
+}
+
+function ovTopValChart() {
+  const m={}; STATE.stock.filter(p=>!p._placeholder).forEach(p=>{ m[p.m]=(m[p.m]||0)+p.q*p.p; });
+  const sorted=Object.entries(m).sort((a,b)=>b[1]-a[1]).slice(0,8);
+  mkChart('c-ov-topval',{type:'bar',data:{labels:sorted.map(e=>e[0]),datasets:[{data:sorted.map(e=>e[1]),
+    backgroundColor:'rgba(79,156,249,0.65)',borderColor:'#4f9cf9',borderWidth:1,borderRadius:5,borderSkipped:false}]},
+    options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',
+      plugins:{...CD,legend:{display:false},tooltip:{...CD.tooltip,callbacks:{label:ctx=>` ${brl(ctx.raw)}`}}},
+      scales:{x:{...CD.scales.x,ticks:{...CD.scales.x.ticks,callback:v=>'R$'+v.toLocaleString('pt-BR')}},y:CD.scales.y}}});
+}
+
+let salesPeriodDays = 7;
+function changeSalesPeriod(days, btn) {
+  salesPeriodDays = days;
+  document.querySelectorAll('#page-overview .ptab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  ovReceitaChart(days);
+}
+
+function ovReceitaChart(days) {
+  const cutoff = dateRange(days);
+  const sales = STATE.log.filter(l=>l.tipo==='venda' && (!cutoff || localDateStr(l.data) >= cutoff));
+  const byDate = {};
+  for (let i=0;i<days;i++) {
+    const d = new Date(); d.setDate(d.getDate()-days+1+i);
+    const key = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+    byDate[key] = {r:0,l:0};
+  }
+  sales.forEach(l=>{
+    const k = localDateStr(l.data);
+    if (byDate[k]) { byDate[k].r += l.receita; byDate[k].l += l.lucro; }
+  });
+  const lbls = Object.keys(byDate).map(d=>{ const [y,m,di]=d.split('-'); return `${di}/${m}`; });
+  mkChart('c-ov-receita',{type:'line',data:{labels:lbls,datasets:[
+    {label:'Receita',data:Object.values(byDate).map(v=>v.r),borderColor:'#4f9cf9',backgroundColor:'rgba(79,156,249,0.06)',fill:true,tension:.4,pointRadius:3,pointBackgroundColor:'#4f9cf9'},
+    {label:'Lucro',data:Object.values(byDate).map(v=>v.l),borderColor:'#22d3a0',backgroundColor:'rgba(34,211,160,0.04)',fill:true,tension:.4,pointRadius:3,pointBackgroundColor:'#22d3a0'}]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{...CD,tooltip:{...CD.tooltip,callbacks:{label:ctx=>` ${ctx.dataset.label}: ${brl(ctx.raw)}`}}},
+      scales:{x:CD.scales.x,y:{...CD.scales.y,ticks:{...CD.scales.y.ticks,callback:v=>'R$'+v.toLocaleString('pt-BR')}}}}});
+}
+
+function ovDecompChart() {
+  const totalVal  = STATE.stock.filter(p=>!p._placeholder).reduce((s,p)=>s+p.q*p.p,0);
+  const totalCost = STATE.stock.filter(p=>!p._placeholder).reduce((s,p)=>s+p.q*p.c,0);
+  mkChart('c-ov-decomp',{type:'bar',data:{labels:['Valor Venda','Custo Total','Lucro Potencial'],datasets:[{data:[totalVal,totalCost,totalVal-totalCost],
+    backgroundColor:['rgba(79,156,249,0.65)','rgba(251,113,133,0.65)','rgba(34,211,160,0.65)'],
+    borderColor:['#4f9cf9','#fb7185','#22d3a0'],borderWidth:1,borderRadius:8,borderSkipped:false}]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{...CD,legend:{display:false},tooltip:{...CD.tooltip,callbacks:{label:ctx=>` ${brl(ctx.raw)}`}}},
+      scales:{x:CD.scales.x,y:{...CD.scales.y,ticks:{...CD.scales.y.ticks,callback:v=>'R$'+(v/1000).toFixed(0)+'k'}}}}});
+}
+
+// ════════════════════════════════════════
+//  FINANCEIRO PAGE
+// ════════════════════════════════════════
+let finPeriod = 'dia';
+function setFinPeriod(p, btn) {
+  finPeriod = p;
+  document.querySelectorAll('#page-financeiro .ptab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderFinanceiro();
+}
+
+function renderFinanceiro() {
+  const logs = filterLogByPeriod(finPeriod);
+  const rec  = logs.reduce((s,l)=>s+l.receita,0);
+  const cost = logs.reduce((s,l)=>s+l.custo,0);
+  const luc  = logs.reduce((s,l)=>s+l.lucro,0);
+  const qtd  = logs.reduce((s,l)=>s+l.qtd,0);
+  const ords = logs.length;
+  const mg   = rec > 0 ? luc/rec*100 : 0;
+
+  document.getElementById('fin-kpis').innerHTML = `
+    <div class="kpi blue"><div class="kpi-glow"></div><div class="kpi-label">Receita — ${periodLabel(finPeriod)}</div><div class="kpi-value">${brl(rec)}</div><span class="kpi-badge ${ords>0?'up':'neu'}">${ords} venda${ords!==1?'s':''}</span></div>
+    <div class="kpi green"><div class="kpi-glow"></div><div class="kpi-label">Lucro — ${periodLabel(finPeriod)}</div><div class="kpi-value">${brl(luc)}</div><span class="kpi-badge ${luc>0?'up':'neu'}">${pct(mg)} margem</span></div>
+    <div class="kpi orange"><div class="kpi-glow"></div><div class="kpi-label">Custo das Vendas</div><div class="kpi-value">${brl(cost)}</div><span class="kpi-badge neu">${pct(rec>0?cost/rec*100:0)} da receita</span></div>
+    <div class="kpi purple"><div class="kpi-glow"></div><div class="kpi-label">Ticket Médio</div><div class="kpi-value">${ords>0?brl(rec/ords):'—'}</div><span class="kpi-badge neu">${qtd} itens vendidos</span></div>
+  `;
+
+  // Main chart — by day
+  const byDate={};
+  logs.forEach(l=>{ const k=localDateStr(l.data); if(!byDate[k])byDate[k]={r:0,c:0,l:0}; byDate[k].r+=l.receita;byDate[k].c+=l.custo;byDate[k].l+=l.lucro; });
+  const ds = Object.keys(byDate).sort();
+  mkChart('c-fin-main',{type:'bar',data:{labels:ds.map(d=>{const[y,m,di]=d.split('-');return`${di}/${m}`;}),datasets:[
+    {label:'Receita',data:ds.map(d=>byDate[d].r),backgroundColor:'rgba(79,156,249,0.7)',borderColor:'#4f9cf9',borderWidth:1,borderRadius:4,borderSkipped:false},
+    {label:'Custo',data:ds.map(d=>byDate[d].c),backgroundColor:'rgba(251,113,133,0.5)',borderColor:'#fb7185',borderWidth:1,borderRadius:4,borderSkipped:false},
+    {label:'Lucro',data:ds.map(d=>byDate[d].l),backgroundColor:'rgba(34,211,160,0.7)',borderColor:'#22d3a0',borderWidth:1,borderRadius:4,borderSkipped:false}]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{...CD,tooltip:{...CD.tooltip,callbacks:{label:ctx=>` ${ctx.dataset.label}: ${brl(ctx.raw)}`}}},
+      scales:{x:CD.scales.x,y:{...CD.scales.y,ticks:{...CD.scales.y.ticks,callback:v=>'R$'+v.toLocaleString('pt-BR')}}}}});
+
+  // By cat
+  const byCat={};
+  logs.forEach(l=>{ byCat[l.categoria]=(byCat[l.categoria]||0)+l.receita; });
+  const catLs=Object.keys(byCat);
+  mkChart('c-fin-cat',{type:'doughnut',data:{labels:catLs,datasets:[{data:Object.values(byCat),backgroundColor:COLORS,borderColor:'#11131d',borderWidth:3,hoverOffset:6}]},
+    options:{responsive:true,maintainAspectRatio:false,cutout:'65%',
+      plugins:{...CD,tooltip:{...CD.tooltip,callbacks:{label:ctx=>` ${ctx.label}: ${brl(ctx.raw)}`}}}}});
+
+  // Margem evolution
+  mkChart('c-fin-margem',{type:'line',data:{labels:ds.map(d=>{const[y,m,di]=d.split('-');return`${di}/${m}`;}),
+    datasets:[{label:'Margem %',data:ds.map(d=>byDate[d].r>0?+(byDate[d].l/byDate[d].r*100).toFixed(1):0),
+      borderColor:'#a78bfa',backgroundColor:'rgba(167,139,250,0.08)',fill:true,tension:.4,pointRadius:4,pointBackgroundColor:'#a78bfa'}]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{...CD,legend:{display:false},tooltip:{...CD.tooltip,callbacks:{label:ctx=>` Margem: ${ctx.raw.toFixed(1).replace('.',',')}%`}}},
+      scales:{x:CD.scales.x,y:{...CD.scales.y,ticks:{...CD.scales.y.ticks,callback:v=>v+'%'}}}}});
+
+  // Top products
+  const byProd={};
+  logs.forEach(l=>{ const k=`${l.modelo}`; if(!byProd[k])byProd[k]=0; byProd[k]+=l.receita; });
+  const topP=Object.entries(byProd).sort((a,b)=>b[1]-a[1]).slice(0,7);
+  mkChart('c-fin-top',{type:'bar',data:{labels:topP.map(e=>e[0]),datasets:[{data:topP.map(e=>e[1]),
+    backgroundColor:'rgba(251,191,36,0.65)',borderColor:'#fbbf24',borderWidth:1,borderRadius:5,borderSkipped:false}]},
+    options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',
+      plugins:{...CD,legend:{display:false},tooltip:{...CD.tooltip,callbacks:{label:ctx=>` ${brl(ctx.raw)}`}}},
+      scales:{x:{...CD.scales.x,ticks:{...CD.scales.x.ticks,callback:v=>'R$'+v.toLocaleString('pt-BR')}},y:CD.scales.y}}});
+
+  // Table
+  const tbody=document.getElementById('fin-tbody');
+  if (!ds.length) { tbody.innerHTML=`<tr><td colspan="7"><div class="empty"><div class="ei">📊</div>Nenhuma venda no período</div></td></tr>`; return; }
+  tbody.innerHTML = ds.sort((a,b)=>b.localeCompare(a)).map(d=>{
+    const v=byDate[d]; const dLogs=logs.filter(l=>localDateStr(l.data)===d);
+    const [y,mo,di]=d.split('-');
+    return `<tr>
+      <td>${di}/${mo}/${y}</td>
+      <td>${dLogs.length}</td>
+      <td>${dLogs.reduce((s,l)=>s+l.qtd,0)}</td>
+      <td style="color:var(--blue)">${brl(v.r)}</td>
+      <td style="color:var(--pink)">${brl(v.c)}</td>
+      <td style="color:var(--green)">${brl(v.l)}</td>
+      <td><span class="kpi-badge ${v.l>0?'up':'neu'}">${pct(v.r>0?v.l/v.r*100:0)}</span></td>
+    </tr>`;
+  }).join('');
+}
+
+// ════════════════════════════════════════
+//  VENDAS PAGE
+// ════════════════════════════════════════
+function renderVendasPage() {
+  document.getElementById('v-date').value = today();
+  updateTodayPanel();
+  renderRecentSales();
+}
+
+function vUpdateModels() {
+  const cat = document.getElementById('v-cat').value;
+  const models = [...new Set(STATE.stock.filter(p=>p.g===cat).map(p=>p.m))];
+  document.getElementById('v-model').innerHTML = models.map(m=>`<option>${m}</option>`).join('');
+  vUpdateFlavors();
+}
+
+function vUpdateFlavors() {
+  const cat=document.getElementById('v-cat').value, model=document.getElementById('v-model').value;
+  const prods = STATE.stock.filter(p=>p.g===cat && p.m===model && !p._placeholder);
+  document.getElementById('v-flavor').innerHTML = prods.map(p=>`<option value="${p.s}">${p.s} (Estoque: ${p.q})</option>`).join('');
+  vAutofill();
+}
+
+function vAutofill() {
+  const cat=document.getElementById('v-cat').value, model=document.getElementById('v-model').value, sab=document.getElementById('v-flavor').value.split(' (')[0];
+  const idx = findIdx(cat, model, sab);
+  if (idx < 0) return;
+  const prod = STATE.stock[idx];
+  document.getElementById('v-price').value = prod.p;
+  vCalc();
+  // Show product info panel
+  document.getElementById('v-product-info').style.display='block';
+  document.getElementById('v-product-details').innerHTML=`
+    <div style="display:grid;gap:8px">
+      <div style="display:flex;justify-content:space-between"><span style="color:var(--muted);font-size:12px">Preço venda</span><strong>${brl(prod.p)}</strong></div>
+      <div style="display:flex;justify-content:space-between"><span style="color:var(--muted);font-size:12px">Custo unitário</span><strong>${brl(prod.c)}</strong></div>
+      <div style="display:flex;justify-content:space-between"><span style="color:var(--muted);font-size:12px">Margem</span><strong style="color:var(--green)">${pct(margem(prod.p,prod.c))}</strong></div>
+      <div style="height:1px;background:var(--border)"></div>
+      <div style="display:flex;justify-content:space-between"><span style="color:var(--muted);font-size:12px">Estoque atual</span><strong style="color:${prod.q===0?'var(--pink)':prod.q<=2?'var(--orange)':'var(--green)'}">${prod.q} unidades</strong></div>
+      <div class="prog-bar"><div class="prog-fill" style="width:${Math.min(prod.q/10*100,100)}%;background:${prod.q===0?'var(--pink)':prod.q<=2?'var(--orange)':'var(--green)'}"></div></div>
+    </div>
+  `;
+}
+
+function vCalc() {
+  const qty = parseFloat(document.getElementById('v-qty').value)||0;
+  const price = parseFloat(document.getElementById('v-price').value)||0;
+  const cat=document.getElementById('v-cat').value, model=document.getElementById('v-model').value;
+  const sab=document.getElementById('v-flavor').value.split(' (')[0];
+  const idx=findIdx(cat,model,sab);
+  const prod = idx>=0 ? STATE.stock[idx] : null;
+  const custo_unit = prod ? prod.c : 0;
+  const rec = qty*price, cost=qty*custo_unit, luc=rec-cost;
+  const mg = rec>0 ? luc/rec*100 : 0;
+  document.getElementById('v-calc-receita').textContent = brl(rec);
+  document.getElementById('v-calc-custo').textContent   = brl(cost);
+  document.getElementById('v-calc-lucro').textContent   = brl(luc);
+  document.getElementById('v-calc-margem').textContent  = pct(mg);
+  if (prod) {
+    document.getElementById('v-calc-stk').textContent = prod.q + ' un.';
+    const after = prod.q - qty;
+    const afterEl = document.getElementById('v-calc-stk-after');
+    afterEl.textContent = after + ' un.';
+    afterEl.style.color = after < 0 ? 'var(--pink)' : after === 0 ? 'var(--orange)' : 'var(--green)';
+    const warnEl = document.getElementById('v-warn');
+    if (qty > prod.q) {
+      warnEl.style.display='block';
+      document.getElementById('v-warn-msg').textContent = `Quantidade insuficiente! Estoque: ${prod.q} un., pedido: ${qty} un.`;
+    } else if (after <= 2 && after >= 0) {
+      warnEl.style.display='block';
+      document.getElementById('v-warn-msg').textContent = `Após esta venda, restam apenas ${after} unidade(s) em estoque.`;
+    } else { warnEl.style.display='none'; }
+  }
+}
+
+function doSale() {
+  const data  = document.getElementById('v-date').value;
+  const cat   = document.getElementById('v-cat').value;
+  const model = document.getElementById('v-model').value;
+  const sabRaw= document.getElementById('v-flavor').value;
+  const sab   = sabRaw.split(' (')[0];
+  const qty   = parseFloat(document.getElementById('v-qty').value)||0;
+  const price = parseFloat(document.getElementById('v-price').value)||0;
+  const obs   = document.getElementById('v-obs').value;
+
+  if (!data||!cat||!model||!sab||qty<=0) { toast('Preencha todos os campos.','error'); return; }
+  const idx = findIdx(cat,model,sab);
+  if (idx < 0) { toast('Produto não encontrado.','error'); return; }
+  const prod = STATE.stock[idx];
+  if (qty > prod.q) { toast(`Estoque insuficiente! Disponível: ${prod.q} un.`,'error'); return; }
+
+  const custo_unit = prod.c;
+  const rec  = qty*price, cost=qty*custo_unit, luc=rec-cost;
+
+  // Deduct stock
+  STATE.stock[idx].q -= qty;
+
+  // Log
+  STATE.log.push({
+    id: Date.now(), tipo:'venda', data: new Date().toISOString(),
+    categoria:cat, modelo:model, sabor:sab,
+    qtd:qty, preco:price, custo_unit, receita:rec, custo:cost, lucro:luc,
+    obs
+  });
+  saveState();
+  toast(`✓ Venda registrada! Lucro: ${brl(luc)}`,'success');
+  updateBadge();
+  // Reset
+  document.getElementById('v-qty').value=1;
+  document.getElementById('v-obs').value='';
+  vUpdateFlavors();
+  updateTodayPanel();
+  renderRecentSales();
+}
+
+function updateTodayPanel() {
+  const tSales = filterLogByPeriod('dia');
+  const rec=tSales.reduce((s,l)=>s+l.receita,0);
+  const luc=tSales.reduce((s,l)=>s+l.lucro,0);
+  const itens=tSales.reduce((s,l)=>s+l.qtd,0);
+  document.getElementById('v-today-panel').innerHTML=`
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <span style="font-size:12px;color:var(--muted)">Receita</span>
+      <span style="font-family:var(--font-d);font-size:18px;font-weight:700;color:var(--blue)">${brl(rec)}</span>
+    </div>
+    <div style="height:1px;background:var(--border)"></div>
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <span style="font-size:12px;color:var(--muted)">Lucro</span>
+      <span style="font-family:var(--font-d);font-size:18px;font-weight:700;color:var(--green)">${brl(luc)}</span>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <span style="font-size:12px;color:var(--muted)">Margem</span>
+      <span style="font-size:14px;color:var(--green);font-weight:600">${rec>0?pct(luc/rec*100):'—'}</span>
+    </div>
+    <div style="height:1px;background:var(--border)"></div>
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <span style="font-size:12px;color:var(--muted)">Transações</span>
+      <span style="font-weight:600">${tSales.length}</span>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <span style="font-size:12px;color:var(--muted)">Itens vendidos</span>
+      <span style="font-weight:600">${itens}</span>
+    </div>
+  `;
+}
+
+function renderRecentSales() {
+  const recent = [...STATE.log].filter(l=>l.tipo==='venda').reverse().slice(0,5);
+  const el = document.getElementById('v-recent-sales');
+  el.innerHTML = recent.length ? recent.map(l=>`
+    <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)">
+      <div style="flex:1;min-width:0">
+        <div style="font-size:12px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${l.modelo} ${l.sabor!=='—'?'— '+l.sabor:''}</div>
+        <div style="font-size:10px;color:var(--muted)">${l.qtd}x · ${l.data.slice(0,10).split('-').reverse().join('/')}</div>
+      </div>
+      <div style="font-family:var(--font-d);font-size:13px;color:var(--blue);font-weight:700">${brl(l.receita)}</div>
+    </div>
+  `).join('') : '<div class="empty" style="padding:20px"><div class="ei">🛒</div>Sem vendas ainda</div>';
+}
+
+// ════════════════════════════════════════
+//  ESTOQUE PAGE
+// ════════════════════════════════════════
+let stkSortCol=-1, stkAsc=true;
+
+function renderEstoque() {
+  const stk = STATE.stock.filter(p=>!p._placeholder);
+  const totalVal  = stk.reduce((s,p)=>s+p.q*p.p,0);
+  const totalCost = stk.reduce((s,p)=>s+p.q*p.c,0);
+  const totalQtd  = stk.reduce((s,p)=>s+p.q,0);
+  const outCount  = stk.filter(p=>p.q===0).length;
+  const numCats   = getAllCategories().length;
+
+  document.getElementById('stk-kpis').innerHTML = `
+    <div class="kpi blue"><div class="kpi-glow"></div><div class="kpi-label">Valor em Estoque</div><div class="kpi-value">${brl(totalVal)}</div><span class="kpi-badge neu">${totalQtd} unidades</span></div>
+    <div class="kpi green"><div class="kpi-glow"></div><div class="kpi-label">Lucro Potencial</div><div class="kpi-value">${brl(totalVal-totalCost)}</div><span class="kpi-badge up">${pct(totalVal>0?(totalVal-totalCost)/totalVal*100:0)} margem</span></div>
+    <div class="kpi pink"><div class="kpi-glow"></div><div class="kpi-label">Produtos Zerados</div><div class="kpi-value">${outCount}</div><span class="kpi-badge ${outCount>0?'down':'up'}">${stk.filter(p=>p.q>0&&p.q<=2).length} em nível baixo</span></div>
+    <div class="kpi purple"><div class="kpi-glow"></div><div class="kpi-label">Total de SKUs</div><div class="kpi-value">${stk.length}</div><span class="kpi-badge neu">${numCats} categoria${numCats!==1?'s':''}</span></div>
+  `;
+
+  renderStockTable();
+  stkCharts();
+}
+
+function renderStockTable() {
+  const search = document.getElementById('stk-search')?.value.toLowerCase()||'';
+  const filterCat = document.getElementById('stk-filter-cat')?.value||'';
+  const filterSt  = document.getElementById('stk-filter-status')?.value||'';
+  let data = STATE.stock.filter(p=>{
+    if (p._placeholder) return false;
+    const matchSearch = !search || p.m.toLowerCase().includes(search)||p.s.toLowerCase().includes(search)||p.g.toLowerCase().includes(search);
+    const matchCat = !filterCat || p.g===filterCat;
+    const matchSt = !filterSt || (filterSt==='ok'&&p.q>2)||(filterSt==='low'&&p.q>0&&p.q<=2)||(filterSt==='out'&&p.q===0);
+    return matchSearch && matchCat && matchSt;
+  });
+  const colKeys=['g','m','s','q','p','c','v','mg'];
+  if (stkSortCol>=0) {
+    data.sort((a,b)=>{
+      let va,vb;
+      if(stkSortCol===3)     {va=a.q;vb=b.q;}
+      else if(stkSortCol===4){va=a.p;vb=b.p;}
+      else if(stkSortCol===5){va=a.c;vb=b.c;}
+      else if(stkSortCol===6){va=a.q*a.p;vb=b.q*b.p;}
+      else if(stkSortCol===7){va=margem(a.p,a.c);vb=margem(b.p,b.c);}
+      else if(stkSortCol===0){va=a.g;vb=b.g;}
+      else                   {va=a.m;vb=b.m;}
+      if(typeof va==='number') return stkAsc?va-vb:vb-va;
+      return stkAsc?String(va).localeCompare(String(vb)):String(vb).localeCompare(String(va));
+    });
+  }
+  const tbody = document.getElementById('stk-tbody');
+  tbody.innerHTML = data.map(p=>{
+    const valor = p.q*p.p;
+    const mg = margem(p.p,p.c);
+    let stIcon,stClass;
+    if(p.q===0){stIcon='🔴 Zerado';stClass='st-out';}
+    else if(p.q<=2){stIcon='🟡 Baixo';stClass='st-low';}
+    else{stIcon='🟢 OK';stClass='st-ok';}
+    return `<tr data-g="${p.g}" data-m="${p.m}" data-s="${p.s}">
+      <td><span style="font-size:10px;color:var(--muted)">${p.g}</span></td>
+      <td><strong>${p.m}</strong></td>
+      <td style="color:var(--muted2);font-size:12px">${p.s}</td>
+      <td><strong style="color:${p.q===0?'var(--pink)':p.q<=2?'var(--orange)':'var(--text)'}">${p.q}</strong></td>
+      <td>${brl(p.p)}</td>
+      <td style="color:var(--muted2)">${brl(p.c)}</td>
+      <td style="color:var(--blue)">${brl(valor)}</td>
+      <td style="color:var(--green)">${pct(mg)}</td>
+      <td class="${stClass}">${stIcon}</td>
+      <td>
+        <div class="row-actions">
+          <button class="btn btn-ghost" style="padding:4px 10px;font-size:11px" onclick="openEdit('${p.g}','${p.m}','${p.s}')">✏️</button>
+          <button class="btn btn-green" style="padding:4px 10px;font-size:11px" onclick="quickAdd('${p.g}','${p.m}','${p.s}')">＋</button>
+        </div>
+      </td>
+    </tr>`;
+  }).join('') || `<tr><td colspan="10"><div class="empty"><div class="ei">🔍</div>Nenhum produto encontrado</div></td></tr>`;
+}
+
+function stkSort(col) {
+  if(stkSortCol===col) stkAsc=!stkAsc; else{stkSortCol=col;stkAsc=true;}
+  renderStockTable();
+}
+
+function stkCharts() {
+  const realStock = STATE.stock.filter(p=>!p._placeholder);
+  // Margem por cat
+  const gc={};
+  realStock.forEach(p=>{ if(!gc[p.g])gc[p.g]={val:0,cost:0};gc[p.g].val+=p.q*p.p;gc[p.g].cost+=p.q*p.c; });
+  const gls=Object.keys(gc);
+  mkChart('c-stk-margem',{type:'bar',data:{labels:gls.map(l=>l.split(' ')[0]),datasets:[{data:gls.map(l=>gc[l].val>0?+((gc[l].val-gc[l].cost)/gc[l].val*100).toFixed(1):0),
+    backgroundColor:COLORS,borderRadius:5,borderSkipped:false}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{...CD,legend:{display:false},tooltip:{...CD.tooltip,callbacks:{label:ctx=>` ${ctx.raw.toFixed(1).replace('.',',')}%`}}},
+      scales:{x:{...CD.scales.x,ticks:{...CD.scales.x.ticks,font:{size:9}}},y:{...CD.scales.y,ticks:{...CD.scales.y.ticks,callback:v=>v+'%'}}}}});
+
+  // Qtd top 10
+  const mq={};
+  realStock.forEach(p=>{ mq[p.m]=(mq[p.m]||0)+p.q; });
+  const topQ=Object.entries(mq).sort((a,b)=>b[1]-a[1]).slice(0,10);
+  mkChart('c-stk-qtd',{type:'bar',data:{labels:topQ.map(e=>e[0]),datasets:[{data:topQ.map(e=>e[1]),
+    backgroundColor:'rgba(34,211,160,0.65)',borderColor:'#22d3a0',borderWidth:1,borderRadius:5,borderSkipped:false}]},
+    options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',plugins:{...CD,legend:{display:false},tooltip:{...CD.tooltip,callbacks:{label:ctx=>` ${ctx.raw} unidades`}}},
+      scales:{x:CD.scales.x,y:{...CD.scales.y,ticks:{...CD.scales.y.ticks,font:{size:9}}}}}});
+
+  // Valor vs Custo
+  const tv=realStock.reduce((s,p)=>s+p.q*p.p,0);
+  const tc=realStock.reduce((s,p)=>s+p.q*p.c,0);
+  mkChart('c-stk-vc',{type:'bar',data:{labels:['Valor Venda','Custo Total','Lucro Pot.'],datasets:[{data:[tv,tc,tv-tc],
+    backgroundColor:['rgba(79,156,249,.65)','rgba(251,113,133,.65)','rgba(34,211,160,.65)'],
+    borderColor:['#4f9cf9','#fb7185','#22d3a0'],borderWidth:1,borderRadius:7,borderSkipped:false}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{...CD,legend:{display:false},tooltip:{...CD.tooltip,callbacks:{label:ctx=>` ${brl(ctx.raw)}`}}},
+      scales:{x:CD.scales.x,y:{...CD.scales.y,ticks:{...CD.scales.y.ticks,callback:v=>'R$'+(v/1000).toFixed(0)+'k'}}}}});
+}
+
+// ════════════════════════════════════════
+//  MODAL: ADD STOCK
+// ════════════════════════════════════════
+function openAddStock(g,m,s) {
+  document.getElementById('modal-addstock').classList.add('open');
+  if (g) {
+    document.getElementById('as-cat').value = g;
+    asUpdateModels();
+    setTimeout(()=>{ document.getElementById('as-model').value=m; asUpdateFlavors(); setTimeout(()=>{ document.getElementById('as-flavor').value=s; asUpdateCalc(); },50); },50);
+  }
+}
+
+function asUpdateModels() {
+  const cat=document.getElementById('as-cat').value;
+  const ms=[...new Set(STATE.stock.filter(p=>p.g===cat).map(p=>p.m))];
+  document.getElementById('as-model').innerHTML=ms.map(m=>`<option>${m}</option>`).join('');
+  asUpdateFlavors();
+}
+
+function asUpdateFlavors() {
+  const cat=document.getElementById('as-cat').value, model=document.getElementById('as-model').value;
+  const prods=STATE.stock.filter(p=>p.g===cat&&p.m===model&&!p._placeholder);
+  document.getElementById('as-flavor').innerHTML=prods.map(p=>`<option value="${p.s}">${p.s} (atual: ${p.q})</option>`).join('');
+  asUpdateCalc();
+  document.getElementById('as-cost').value = prods[0]?.c || '';
+}
+
+function asUpdateCalc() {
+  const cat=document.getElementById('as-cat').value, model=document.getElementById('as-model').value;
+  const sab=document.getElementById('as-flavor').value.split(' (')[0];
+  const idx=findIdx(cat,model,sab);
+  const prod=idx>=0?STATE.stock[idx]:null;
+  const qty=parseFloat(document.getElementById('as-qty').value)||0;
+  document.getElementById('as-cur').textContent = prod ? prod.q+' un.' : '—';
+  document.getElementById('as-after').textContent = prod ? (prod.q+qty)+' un.' : '—';
+}
+document.getElementById('as-qty')?.addEventListener('input', asUpdateCalc);
+document.getElementById('as-flavor')?.addEventListener('change', asUpdateCalc);
+
+function doAddStock() {
+  const cat=document.getElementById('as-cat').value, model=document.getElementById('as-model').value;
+  const sab=document.getElementById('as-flavor').value.split(' (')[0];
+  const qty=parseFloat(document.getElementById('as-qty').value)||0;
+  const newCost=parseFloat(document.getElementById('as-cost').value)||0;
+  const obs=document.getElementById('as-obs').value;
+  if(!cat||!model||!sab||qty<=0){toast('Preencha todos os campos.','error');return;}
+  const idx=findIdx(cat,model,sab);
+  if(idx<0){toast('Produto não encontrado.','error');return;}
+  STATE.stock[idx].q += qty;
+  if(newCost>0) STATE.stock[idx].c = newCost;
+  STATE.log.push({id:Date.now(),tipo:'entrada',data:new Date().toISOString(),categoria:cat,modelo:model,sabor:sab,qtd:qty,preco:0,custo_unit:newCost||STATE.stock[idx].c,receita:0,custo:0,lucro:0,obs});
+  saveState();
+  closeModal('modal-addstock');
+  toast(`✓ +${qty} unidades adicionadas ao estoque!`,'success');
+  renderEstoque();
+  updateBadge();
+}
+
+// ════════════════════════════════════════
+//  MODAL: EDIT
+// ════════════════════════════════════════
+let editTarget = null;
+function openEdit(g,m,s) {
+  const idx=findIdx(g,m,s);
+  if(idx<0) return;
+  editTarget = idx;
+  const prod=STATE.stock[idx];
+  document.getElementById('edit-product-info').innerHTML=`
+    <strong>${prod.m}</strong> — ${prod.s}<br>
+    <span style="color:var(--muted);font-size:12px">${prod.g}</span>
+  `;
+  document.getElementById('edit-qty').value=prod.q;
+  document.getElementById('edit-price').value=prod.p;
+  document.getElementById('edit-cost').value=prod.c;
+  document.getElementById('edit-obs').value='';
+  document.getElementById('modal-edit').classList.add('open');
+}
+
+function doEdit() {
+  if(editTarget===null) return;
+  const qty=parseFloat(document.getElementById('edit-qty').value)||0;
+  const price=parseFloat(document.getElementById('edit-price').value)||0;
+  const cost=parseFloat(document.getElementById('edit-cost').value)||0;
+  const obs=document.getElementById('edit-obs').value;
+  const prev=STATE.stock[editTarget];
+  STATE.log.push({id:Date.now(),tipo:'ajuste',data:new Date().toISOString(),
+    categoria:prev.g,modelo:prev.m,sabor:prev.s,
+    qtd:qty-prev.q,preco:price,custo_unit:cost,receita:0,custo:0,lucro:0,
+    obs:`Ajuste manual. Antes: qtd=${prev.q} p=${prev.p} c=${prev.c}. ${obs}`});
+  STATE.stock[editTarget].q=qty;
+  STATE.stock[editTarget].p=price;
+  STATE.stock[editTarget].c=cost;
+  saveState();
+  closeModal('modal-edit');
+  toast('✓ Estoque ajustado com sucesso!','success');
+  renderEstoque();
+  updateBadge();
+}
+
+function quickAdd(g,m,s) {
+  openAddStock(g,m,s);
+}
+
+// ════════════════════════════════════════
+//  MODAL UTILS
+// ════════════════════════════════════════
+function closeModal(id, evt) {
+  if(evt && evt.target !== document.getElementById(id)) return;
+  document.getElementById(id).classList.remove('open');
+}
+
+// ════════════════════════════════════════
+//  HISTORICO PAGE
+// ════════════════════════════════════════
+function renderHistorico() {
+  const search=(document.getElementById('hist-search')?.value||'').toLowerCase();
+  const type=document.getElementById('hist-type')?.value||'';
+  const days=parseInt(document.getElementById('hist-period')?.value||'30');
+  const cutoff=days>0?dateRange(days):null;
+  let data=[...STATE.log].reverse().filter(l=>{
+    const matchType=!type||l.tipo===type;
+    const matchDate=!cutoff||l.data>=cutoff;
+    const matchSearch=!search||l.modelo.toLowerCase().includes(search)||l.sabor.toLowerCase().includes(search);
+    return matchType&&matchDate&&matchSearch;
+  });
+  const tbody=document.getElementById('hist-tbody');
+  tbody.innerHTML=data.length?data.map(l=>{
+    const typeTag=l.tipo==='venda'?'<span class="tag tag-blue">🛒 Venda</span>':l.tipo==='entrada'?'<span class="tag tag-green">📥 Entrada</span>':'<span class="tag tag-purple">🔧 Ajuste</span>';
+    const dt=new Date(l.data);
+    const dtStr=dt.toLocaleDateString('pt-BR')+' '+dt.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+    return `<tr>
+      <td style="font-size:11px;color:var(--muted2)">${dtStr}</td>
+      <td>${typeTag}</td>
+      <td><strong>${l.modelo}</strong></td>
+      <td style="color:var(--muted2);font-size:12px">${l.sabor}</td>
+      <td>${l.qtd>0?'+'+l.qtd:l.qtd}</td>
+      <td>${l.preco>0?brl(l.preco):'—'}</td>
+      <td style="color:var(--blue)">${l.receita>0?brl(l.receita):'—'}</td>
+      <td style="color:var(--pink)">${l.custo>0?brl(l.custo):'—'}</td>
+      <td style="color:var(--green)">${l.lucro>0?brl(l.lucro):'—'}</td>
+      <td style="color:var(--muted);font-size:11px">${l.obs||'—'}</td>
+      <td>
+        ${l.tipo==='venda'?`<button class="btn btn-pink" style="padding:3px 8px;font-size:10px" onclick="estornarVenda(${l.id})">↩ Estornar</button>`:''}
+      </td>
+    </tr>`;
+  }).join(''):`<tr><td colspan="11"><div class="empty"><div class="ei">📋</div>Nenhum registro no período</div></td></tr>`;
+}
+
+function estornarVenda(id) {
+  const idx = STATE.log.findIndex(l=>l.id===id);
+  if(idx<0){toast('Venda não encontrada.','error');return;}
+  const l=STATE.log[idx];
+  if(!confirm(`Estornar venda de ${l.qtd}x ${l.modelo} — ${l.sabor}?\nO estoque será devolvido.`)) return;
+  const sIdx=findIdx(l.categoria,l.modelo,l.sabor);
+  if(sIdx>=0) STATE.stock[sIdx].q += l.qtd;
+  STATE.log.push({id:Date.now(),tipo:'ajuste',data:new Date().toISOString(),
+    categoria:l.categoria,modelo:l.modelo,sabor:l.sabor,
+    qtd:l.qtd,preco:0,custo_unit:0,receita:0,custo:0,lucro:0,
+    obs:`Estorno da venda #${id}`});
+  STATE.log.splice(idx,1);
+  saveState();
+  toast('✓ Venda estornada e estoque devolvido!','info');
+  renderHistorico();
+  updateBadge();
+}
+
+function exportCSV() {
+  const rows=[['Data','Tipo','Produto','Sabor','Qtd','Preço Unit','Receita','Custo','Lucro','Obs']];
+  STATE.log.forEach(l=>{
+    rows.push([l.data,l.tipo,l.modelo,l.sabor,l.qtd,l.preco,l.receita,l.custo,l.lucro,l.obs||'']);
+  });
+  const csv=rows.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const a=document.createElement('a');
+  a.href='data:text/csv;charset=utf-8,\uFEFF'+encodeURIComponent(csv);
+  a.download='udipods_historico.csv';
+  a.click();
+  toast('CSV exportado!','success');
+}
+
+// ════════════════════════════════════════
+//  BADGE + CLOCK
+// ════════════════════════════════════════
+function updateBadge() {
+  document.getElementById('badge-hist').textContent = STATE.log.length;
+}
+
+function updateClock() {
+  const now=new Date();
+  document.getElementById('clock').textContent=now.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  document.getElementById('clock-date').textContent=now.toLocaleDateString('pt-BR',{weekday:'short',day:'2-digit',month:'short',year:'numeric'});
+}
+
+// ════════════════════════════════════════
+//  INIT
+// ════════════════════════════════════════
+// ════════════════════════════════════════
+//  HELPERS: get all unique categories / models
+// ════════════════════════════════════════
+function getAllCategories() {
+  const fromStock = [...new Set(STATE.stock.map(p=>p.g))];
+  const custom = STATE.customCats || [];
+  return [...new Set([...fromStock, ...custom])].sort();
+}
+function getModelsOfCat(cat) {
+  return [...new Set(STATE.stock.filter(p=>p.g===cat).map(p=>p.m))].sort();
+}
+function getFlavorsOfModel(cat,model) {
+  return STATE.stock.filter(p=>p.g===cat&&p.m===model).map(p=>p.s);
+}
+
+// ── Populate all <select> elements that list categories ──
+function refreshAllCatSelects() {
+  const cats = getAllCategories();
+  const opts = cats.map(c=>`<option value="${c}">${c}</option>`).join('');
+  const emptyOpt = '<option value="">Selecione...</option>';
+
+  // Sale modal
+  ['v-cat','as-cat'].forEach(id=>{
+    const el = document.getElementById(id);
+    if (!el) return;
+    const cur = el.value;
+    el.innerHTML = emptyOpt + opts;
+    if (cur) el.value = cur;
+  });
+
+  // Cadastro selects
+  ['np-cat','nm-cat','ns-cat'].forEach(id=>{
+    const el = document.getElementById(id);
+    if (!el) return;
+    const cur = el.value;
+    el.innerHTML = emptyOpt + opts;
+    if (cur) el.value = cur;
+  });
+
+  // Stock filter
+  const sf = document.getElementById('stk-filter-cat');
+  if (sf) {
+    const cur = sf.value;
+    sf.innerHTML = '<option value="">Todas as categorias</option>' + opts;
+    if (cur) sf.value = cur;
+  }
+
+  // Catalog filter
+  const clf = document.getElementById('cat-list-filter');
+  if (clf) {
+    clf.innerHTML = '<option value="">Todas as categorias</option>' + opts;
+  }
+}
+
+// ════════════════════════════════════════
+//  CADASTRO PAGE
+// ════════════════════════════════════════
+function renderCadastro() {
+  refreshAllCatSelects();
+  cadUpdateStats();
+  // default show novo tab
+  const activePanel = document.querySelector('[id^="cad-panel-"]:not([style*="none"])');
+  const id = activePanel ? activePanel.id.replace('cad-panel-','') : 'novo';
+  cadTab(id, document.getElementById('cad-tab-'+id));
+}
+
+function cadTab(name, btn) {
+  ['novo','cat','model','sabor','list'].forEach(n=>{
+    document.getElementById('cad-panel-'+n).style.display = n===name ? 'block' : 'none';
+  });
+  document.querySelectorAll('#cad-tabs .ptab').forEach(b=>b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  if (name==='cat')   ncRenderExisting();
+  if (name==='model') { nmFillCats(); nmRefreshModels(); }
+  if (name==='sabor') { nsFillCats(); }
+  if (name==='list')  renderCatalog();
+  if (name==='novo')  { npFillCats(); npUpdatePreview(); cadUpdateStats(); }
+}
+
+function cadUpdateStats() {
+  const cats = getAllCategories();
+  const models = [...new Set(STATE.stock.map(p=>p.m))];
+  const total = STATE.stock.length;
+  const zeros = STATE.stock.filter(p=>p.q===0).length;
+  const el = document.getElementById('cad-stats');
+  if (!el) return;
+  el.innerHTML = cats.map(c=>{
+    const ms = getModelsOfCat(c);
+    const skus = STATE.stock.filter(p=>p.g===c).length;
+    return `<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--border)">
+      <div>
+        <div style="font-size:12px;font-weight:600">${c}</div>
+        <div style="font-size:10px;color:var(--muted)">${ms.length} modelo(s) · ${skus} SKUs</div>
+      </div>
+      <span class="kpi-badge neu">${ms.length}M / ${skus}S</span>
+    </div>`;
+  }).join('') + `<div style="margin-top:10px;font-size:11px;color:var(--muted)">
+    Total: ${total} SKUs · ${cats.length} categorias · ${models.length} modelos · ${zeros} zerados
+  </div>`;
+}
+
+// ── NOVO PRODUTO ──
+function npFillCats() {
+  const cats = getAllCategories();
+  const el = document.getElementById('np-cat');
+  if (!el) return;
+  el.innerHTML = '<option value="">Selecione ou crie...</option>' + cats.map(c=>`<option>${c}</option>`).join('');
+}
+
+function npCatChange() {
+  const cat = document.getElementById('np-cat').value;
+  const ms = cat ? getModelsOfCat(cat) : [];
+  document.getElementById('np-model').innerHTML = ms.length
+    ? ms.map(m=>`<option>${m}</option>`).join('')
+    : '<option value="">— selecione categoria primeiro —</option>';
+  document.getElementById('np-sabor').value = '';
+  npUpdatePreview();
+}
+
+function npModelChange() {
+  document.getElementById('np-sabor').value = '';
+  npCheckDuplicate();
+  npUpdatePreview();
+}
+
+function npCheckDuplicate() {
+  const cat = document.getElementById('np-cat').value;
+  const model = document.getElementById('np-model').value;
+  const sabor = document.getElementById('np-sabor').value.trim();
+  const exists = sabor && STATE.stock.some(p=>p.g===cat&&p.m===model&&p.s===sabor);
+  document.getElementById('np-dup-warn').style.display = exists ? 'block' : 'none';
+  npUpdatePreview();
+}
+
+function npCalc() {
+  const preco = parseFloat(document.getElementById('np-preco').value)||0;
+  const custo = parseFloat(document.getElementById('np-custo').value)||0;
+  const qty   = parseFloat(document.getElementById('np-qty').value)||0;
+  const margem = preco > 0 ? (preco-custo)/preco*100 : 0;
+  document.getElementById('np-c-margem').textContent = preco > 0 ? pct(margem) : '—';
+  document.getElementById('np-c-valor').textContent  = brl(qty*preco);
+  document.getElementById('np-c-lucro').textContent  = brl(qty*(preco-custo));
+  npUpdatePreview();
+}
+
+function npUpdatePreview() {
+  const cat   = document.getElementById('np-cat')?.value||'';
+  const model = document.getElementById('np-model')?.value||'';
+  const sabor = document.getElementById('np-sabor')?.value||'';
+  const preco = parseFloat(document.getElementById('np-preco')?.value)||0;
+  const custo = parseFloat(document.getElementById('np-custo')?.value)||0;
+  const qty   = parseFloat(document.getElementById('np-qty')?.value)||0;
+  const prev  = document.getElementById('np-preview');
+  const body  = document.getElementById('np-preview-body');
+  if (!prev||!body) return;
+  if (!cat&&!model&&!sabor) { prev.style.display='none'; return; }
+  prev.style.display='block';
+  const mg = preco>0?(preco-custo)/preco*100:0;
+  body.innerHTML = `
+    <div style="font-size:11px;color:var(--muted);margin-bottom:8px">${cat}</div>
+    <div style="font-size:16px;font-weight:700;margin-bottom:4px">${model||'—'}</div>
+    <div style="font-size:13px;color:var(--muted2);margin-bottom:16px">${sabor||'—'}</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;text-align:center">
+      <div style="background:var(--surface);border-radius:8px;padding:10px">
+        <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em">Preço</div>
+        <div style="font-family:var(--font-d);font-size:15px;font-weight:700;color:var(--blue)">${brl(preco)}</div>
+      </div>
+      <div style="background:var(--surface);border-radius:8px;padding:10px">
+        <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em">Custo</div>
+        <div style="font-family:var(--font-d);font-size:15px;font-weight:700;color:var(--pink)">${brl(custo)}</div>
+      </div>
+      <div style="background:var(--surface);border-radius:8px;padding:10px">
+        <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em">Margem</div>
+        <div style="font-family:var(--font-d);font-size:15px;font-weight:700;color:var(--green)">${preco>0?pct(mg):'—'}</div>
+      </div>
+    </div>
+    <div style="margin-top:12px;background:var(--surface);border-radius:8px;padding:10px;text-align:center">
+      <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em">Qtd Inicial</div>
+      <div style="font-family:var(--font-d);font-size:18px;font-weight:700">${qty} unidade${qty!==1?'s':''}</div>
+    </div>
+  `;
+}
+
+function doNewProduct() {
+  const cat   = document.getElementById('np-cat').value.trim();
+  const model = document.getElementById('np-model').value.trim();
+  const sabor = document.getElementById('np-sabor').value.trim();
+  const preco = parseFloat(document.getElementById('np-preco').value)||0;
+  const custo = parseFloat(document.getElementById('np-custo').value)||0;
+  const qty   = parseFloat(document.getElementById('np-qty').value)||0;
+
+  if (!cat||!model||!sabor) { toast('Preencha Categoria, Modelo e Sabor.','error'); return; }
+  if (preco<=0) { toast('Informe o preço de venda.','error'); return; }
+  if (STATE.stock.some(p=>p.g===cat&&p.m===model&&p.s===sabor)) {
+    toast('Este SKU já existe! Use "Ajustar Estoque" para editar.','error'); return;
+  }
+
+  STATE.stock.push({g:cat, m:model, s:sabor, q:qty, p:preco, c:custo});
+  if (qty>0) {
+    STATE.log.push({id:Date.now(),tipo:'entrada',data:new Date().toISOString(),
+      categoria:cat,modelo:model,sabor,qtd:qty,preco,custo_unit:custo,receita:0,custo:0,lucro:0,
+      obs:`Cadastro inicial de produto: ${cat} / ${model} / ${sabor}`});
+  }
+  saveState();
+  refreshAllCatSelects();
+  toast(`✓ "${model} — ${sabor}" adicionado ao estoque!`,'success');
+
+  // Reset fields
+  document.getElementById('np-sabor').value='';
+  document.getElementById('np-preco').value='';
+  document.getElementById('np-custo').value='';
+  document.getElementById('np-qty').value='0';
+  document.getElementById('np-dup-warn').style.display='none';
+  document.getElementById('np-preview').style.display='none';
+  npCalc();
+  cadUpdateStats();
+  updateBadge();
+}
+
+// ── NOVA CATEGORIA ──
+function ncRenderExisting() {
+  const cats = getAllCategories();
+  const el = document.getElementById('nc-existing');
+  if (!el) return;
+  el.innerHTML = cats.map(c=>{
+    const skus = STATE.stock.filter(p=>p.g===c).length;
+    return `<div style="display:flex;justify-content:space-between;align-items:center;padding:9px 12px;background:var(--surface);border-radius:var(--r3);margin-bottom:6px">
+      <span style="font-size:13px;font-weight:600">${c}</span>
+      <span class="kpi-badge neu">${skus} SKUs</span>
+    </div>`;
+  }).join('') || '<div style="color:var(--muted);font-size:13px">Nenhuma categoria cadastrada ainda.</div>';
+}
+
+function doNewCategory() {
+  const nome = (document.getElementById('nc-nome').value||'').trim().toUpperCase();
+  if (!nome) { toast('Digite o nome da categoria.','error'); return; }
+  if (getAllCategories().includes(nome)) { toast('Esta categoria já existe!','error'); return; }
+  // Create a placeholder SKU to "register" the category; user must add products after
+  // Actually just add a placeholder that renders properly — we'll create it as a pending model
+  // Best approach: don't create phantom SKUs. Store custom categories separately.
+  if (!STATE.customCats) STATE.customCats = [];
+  if (!STATE.customCats.includes(nome)) STATE.customCats.push(nome);
+  saveState();
+  refreshAllCatSelects();
+  ncRenderExisting();
+  document.getElementById('nc-nome').value='';
+  document.getElementById('nc-desc').value='';
+  toast(`✓ Categoria "${nome}" criada! Agora adicione modelos a ela.`,'success');
+}
+
+// ── NOVO MODELO ──
+function nmFillCats() {
+  const cats = getAllCategories();
+  const el = document.getElementById('nm-cat');
+  if (!el) return;
+  const cur = el.value;
+  el.innerHTML = '<option value="">Selecione...</option>' + cats.map(c=>`<option>${c}</option>`).join('');
+  if (cur) el.value = cur;
+}
+
+function nmRefreshModels() {
+  const cat = document.getElementById('nm-cat').value;
+  const ms  = cat ? getModelsOfCat(cat) : [];
+  const el  = document.getElementById('nm-existing');
+  if (!el) return;
+  el.innerHTML = ms.length
+    ? ms.map(m=>{
+        const skus = STATE.stock.filter(p=>p.g===cat&&p.m===m).length;
+        return `<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:var(--surface);border-radius:var(--r3);margin-bottom:5px">
+          <span style="font-size:13px;font-weight:600">${m}</span>
+          <span class="kpi-badge neu">${skus} var.</span>
+        </div>`;
+      }).join('')
+    : '<div style="font-size:12px;color:var(--muted)">Nenhum modelo nesta categoria.</div>';
+}
+
+function doNewModel() {
+  const cat  = document.getElementById('nm-cat').value.trim();
+  const nome = document.getElementById('nm-nome').value.trim();
+  if (!cat)  { toast('Selecione uma categoria.','error'); return; }
+  if (!nome) { toast('Digite o nome do modelo.','error'); return; }
+  if (getModelsOfCat(cat).includes(nome)) { toast('Este modelo já existe nesta categoria!','error'); return; }
+  // Register model as a placeholder SKU with qty=0 and placeholder sabor
+  // so it appears in dropdowns. User completes via "Novo Sabor"
+  STATE.stock.push({g:cat, m:nome, s:'—', q:0, p:0, c:0, _placeholder:true});
+  saveState();
+  refreshAllCatSelects();
+  nmRefreshModels();
+  document.getElementById('nm-nome').value='';
+  toast(`✓ Modelo "${nome}" criado em ${cat}. Agora adicione sabores!`,'success');
+  cadUpdateStats();
+}
+
+// ── NOVO SABOR ──
+function nsFillCats() {
+  const cats = getAllCategories();
+  const el = document.getElementById('ns-cat');
+  if (!el) return;
+  const cur = el.value;
+  el.innerHTML = '<option value="">Selecione...</option>' + cats.map(c=>`<option>${c}</option>`).join('');
+  if (cur) el.value = cur;
+}
+
+function nsUpdateModels() {
+  const cat = document.getElementById('ns-cat').value;
+  const ms  = cat ? getModelsOfCat(cat) : [];
+  const el  = document.getElementById('ns-model');
+  if (!el) return;
+  el.innerHTML = ms.length
+    ? ms.map(m=>`<option>${m}</option>`).join('')
+    : '<option value="">— selecione categoria —</option>';
+  nsRefreshFlavors();
+  // Pre-fill price/cost from first SKU of model
+  if (cat && ms.length) {
+    const first = STATE.stock.find(p=>p.g===cat&&p.m===ms[0]);
+    if (first) {
+      document.getElementById('ns-preco').value = first.p||'';
+      document.getElementById('ns-custo').value = first.c||'';
+    }
+  }
+}
+
+function nsRefreshFlavors() {
+  const cat   = document.getElementById('ns-cat').value;
+  const model = document.getElementById('ns-model').value;
+  const flavs = cat&&model ? getFlavorsOfModel(cat,model) : [];
+  const el    = document.getElementById('ns-existing');
+  if (!el) return;
+  el.innerHTML = flavs.length
+    ? flavs.map(f=>{
+        const p = STATE.stock.find(x=>x.g===cat&&x.m===model&&x.s===f);
+        const qty = p?p.q:0;
+        return `<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 10px;background:var(--surface);border-radius:var(--r3);margin-bottom:4px">
+          <span style="font-size:12px">${f}</span>
+          <span class="${qty===0?'kpi-badge down':qty<=2?'kpi-badge':'kpi-badge up'}">${qty} un.</span>
+        </div>`;
+      }).join('')
+    : '<div style="font-size:12px;color:var(--muted)">Nenhum sabor cadastrado ainda.</div>';
+
+  // pre-fill cost/price from model's first product
+  if (cat&&model) {
+    const first = STATE.stock.find(p=>p.g===cat&&p.m===model&&!p._placeholder);
+    if (first) {
+      if (!document.getElementById('ns-preco').value) document.getElementById('ns-preco').value=first.p||'';
+      if (!document.getElementById('ns-custo').value) document.getElementById('ns-custo').value=first.c||'';
+    }
+  }
+}
+
+function doNewSabor() {
+  const cat   = document.getElementById('ns-cat').value.trim();
+  const model = document.getElementById('ns-model').value.trim();
+  const nome  = document.getElementById('ns-nome').value.trim();
+  const preco = parseFloat(document.getElementById('ns-preco').value)||0;
+  const custo = parseFloat(document.getElementById('ns-custo').value)||0;
+  const qty   = parseFloat(document.getElementById('ns-qty').value)||0;
+
+  if (!cat||!model)  { toast('Selecione categoria e modelo.','error'); return; }
+  if (!nome)         { toast('Digite o nome do sabor.','error'); return; }
+  if (preco<=0)      { toast('Informe o preço de venda.','error'); return; }
+  if (STATE.stock.some(p=>p.g===cat&&p.m===model&&p.s===nome)) {
+    toast('Este sabor já existe neste modelo!','error'); return;
+  }
+
+  // Remove placeholder if it's the only entry
+  const phIdx = STATE.stock.findIndex(p=>p.g===cat&&p.m===model&&p._placeholder);
+  if (phIdx >= 0 && STATE.stock.filter(p=>p.g===cat&&p.m===model).length===1) {
+    STATE.stock.splice(phIdx,1);
+  }
+
+  STATE.stock.push({g:cat, m:model, s:nome, q:qty, p:preco, c:custo});
+  if (qty>0) {
+    STATE.log.push({id:Date.now(),tipo:'entrada',data:new Date().toISOString(),
+      categoria:cat,modelo:model,sabor:nome,qtd:qty,preco,custo_unit:custo,receita:0,custo:0,lucro:0,
+      obs:`Novo sabor cadastrado: ${nome}`});
+  }
+  saveState();
+  refreshAllCatSelects();
+  nsRefreshFlavors();
+  document.getElementById('ns-nome').value='';
+  document.getElementById('ns-qty').value='0';
+  toast(`✓ Sabor "${nome}" adicionado ao modelo ${model}!`,'success');
+  cadUpdateStats();
+  updateBadge();
+}
+
+// ── CATALOG LIST ──
+function renderCatalog() {
+  const search = (document.getElementById('cat-list-search')?.value||'').toLowerCase();
+  const catF   = document.getElementById('cat-list-filter')?.value||'';
+  const data   = STATE.stock.filter(p=>{
+    if (p._placeholder) return false;
+    const txt = (p.g+p.m+p.s).toLowerCase();
+    if (!txt.includes(search)) return false;
+    if (catF && p.g!==catF) return false;
+    return true;
+  });
+  document.getElementById('cat-list-count').textContent = data.length + ' SKU(s)';
+  const tbody = document.getElementById('cat-list-tbody');
+  if (!tbody) return;
+  tbody.innerHTML = data.map(p=>{
+    const mg = p.p>0?(p.p-p.c)/p.p*100:0;
+    let stIcon,stClass;
+    if(p.q===0){stIcon='🔴 Zerado';stClass='st-out';}
+    else if(p.q<=2){stIcon='🟡 Baixo';stClass='st-low';}
+    else{stIcon='🟢 OK';stClass='st-ok';}
+    return `<tr>
+      <td><span style="font-size:10px;color:var(--muted)">${p.g}</span></td>
+      <td><strong>${p.m}</strong></td>
+      <td style="color:var(--muted2);font-size:12px">${p.s}</td>
+      <td><strong style="color:${p.q===0?'var(--pink)':p.q<=2?'var(--orange)':'var(--text)'}">${p.q}</strong></td>
+      <td style="color:var(--blue)">${brl(p.p)}</td>
+      <td style="color:var(--muted2)">${brl(p.c)}</td>
+      <td style="color:var(--green)">${pct(mg)}</td>
+      <td class="${stClass}">${stIcon}</td>
+      <td>
+        <div style="display:flex;gap:4px">
+          <button class="btn btn-ghost" style="padding:3px 9px;font-size:11px" onclick="openEdit('${p.g}','${p.m}','${p.s}')">✏️ Editar</button>
+          <button class="btn btn-green" style="padding:3px 9px;font-size:11px" onclick="quickAdd('${p.g}','${p.m}','${p.s}')">＋ Repor</button>
+        </div>
+      </td>
+    </tr>`;
+  }).join('') || `<tr><td colspan="9"><div class="empty"><div class="ei">🔍</div>Nenhum produto encontrado</div></td></tr>`;
+}
+
+// ════════════════════════════════════════
+//  PATCH saveState to include customCats
+// ════════════════════════════════════════
+// (already handled in STATE object — customCats persisted via saveState)
+
+document.addEventListener('DOMContentLoaded', ()=>{
+  if (!STATE.customCats) STATE.customCats = [];
+  refreshAllCatSelects();
+  updateBadge();
+  updateClock();
+  setInterval(updateClock, 1000);
+  renderOverview();
+
+  // ── SYNC INIT ──
+  // Ao abrir, puxa da nuvem — se nuvem for mais recente, atualiza tudo
+  syncFromCloud();
+
+  // Auto-sincroniza a cada 60 segundos em segundo plano
+  setInterval(() => {
+    if (syncOnline) syncFromCloud();
+  }, 60000);
+
+  // Sincroniza ao voltar para a aba (celular/PC alternando)
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') syncFromCloud();
+  });
+});
+</script>
+</body>
+</html>
