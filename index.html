@@ -41,10 +41,6 @@ nav{width:var(--nav-w);min-height:100vh;background:var(--surface);border-right:1
 .nav-bottom{margin-top:auto;padding:16px;border-top:1px solid var(--border)}
 .clock{font-family:var(--font-d);font-size:22px;font-weight:700;color:var(--text);letter-spacing:-1px}
 .clock-date{font-size:11px;color:var(--muted);margin-top:2px}
-.sync-bar{display:flex;align-items:center;gap:7px;padding:8px 10px;border-radius:var(--r3);border:1px solid rgba(34,211,160,.2);background:var(--green-dim);margin-top:12px;cursor:pointer;transition:opacity .2s}
-.sync-bar:hover{opacity:.8}
-.sync-btn{width:100%;margin-top:8px;padding:7px;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:var(--r3);color:var(--muted2);font-size:11px;font-weight:600;cursor:pointer;font-family:var(--font-b);transition:all .2s}
-.sync-btn:hover{background:rgba(255,255,255,.08);color:var(--text)}
 
 /* ─── MAIN ─── */
 .main-wrap{margin-left:var(--nav-w);flex:1;min-height:100vh;display:flex;flex-direction:column}
@@ -266,11 +262,16 @@ tbody tr:hover .row-actions{opacity:1}
   <div class="nav-bottom">
     <div class="clock" id="clock">--:--</div>
     <div class="clock-date" id="clock-date">Carregando...</div>
-    <div class="sync-bar" id="sync-status" onclick="syncFromCloud()" title="Clique para sincronizar agora">
+    <div id="sync-status" onclick="syncFromCloud()" title="Clique para sincronizar"
+      style="display:flex;align-items:center;gap:7px;padding:8px 10px;border-radius:8px;border:1px solid rgba(34,211,160,.2);background:var(--green-dim);margin-top:12px;cursor:pointer;transition:opacity .2s">
       <span style="font-size:13px">☁️</span>
       <span style="font-size:11px;font-weight:600;color:var(--green)">Conectando...</span>
     </div>
-    <button class="sync-btn" onclick="syncFromCloud()">🔄 Sincronizar Agora</button>
+    <button onclick="syncFromCloud()"
+      style="width:100%;margin-top:8px;padding:7px;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:8px;color:var(--muted2);font-size:11px;font-weight:600;cursor:pointer;font-family:var(--font-b)"
+      onmouseover="this.style.background='rgba(255,255,255,.09)'" onmouseout="this.style.background='rgba(255,255,255,.04)'">
+      🔄 Sincronizar Agora
+    </button>
   </div>
 </nav>
 
@@ -988,312 +989,285 @@ tbody tr:hover .row-actions{opacity:1}
 //  DATA — INITIAL STOCK
 // ════════════════════════════════════════
 const INIT_STOCK = [
-  {g:"PODS DESCARTÁVEIS",m:"V250",s:"Strawberry Ice",q:5,p:140,c:62},
-  {g:"PODS DESCARTÁVEIS",m:"V250",s:"Grape Ice",q:7,p:140,c:62},
-  {g:"PODS DESCARTÁVEIS",m:"V250",s:"Strawberry Banana",q:1,p:140,c:62},
-  {g:"PODS DESCARTÁVEIS",m:"V250",s:"Icy Mint",q:7,p:140,c:62},
-  {g:"PODS DESCARTÁVEIS",m:"V250",s:"Banana Ice",q:2,p:140,c:62},
-  {g:"PODS DESCARTÁVEIS",m:"V250",s:"Green Apple",q:5,p:140,c:62},
-  {g:"PODS DESCARTÁVEIS",m:"V250",s:"Watermelon",q:3,p:140,c:62},
-  {g:"PODS DESCARTÁVEIS",m:"V250",s:"Blueberry",q:5,p:140,c:62},
-  {g:"PODS DESCARTÁVEIS",m:"V250",s:"Strawberry Kiwi",q:1,p:140,c:62},
-  {g:"PODS DESCARTÁVEIS",m:"V250",s:"Menthol",q:5,p:140,c:62},
-  {g:"PODS DESCARTÁVEIS",m:"V250",s:"Pineapple",q:6,p:140,c:62},
-  {g:"PODS DESCARTÁVEIS",m:"V300",s:"Grape Ice",q:4,p:160,c:70},
-  {g:"PODS DESCARTÁVEIS",m:"V300",s:"Pineapple",q:2,p:160,c:70},
-  {g:"PODS DESCARTÁVEIS",m:"V300",s:"Strawberry Banana",q:5,p:160,c:70},
-  {g:"PODS DESCARTÁVEIS",m:"V300",s:"Strawberry Ice",q:5,p:160,c:70},
-  {g:"PODS DESCARTÁVEIS",m:"V300",s:"Menthol",q:6,p:160,c:70},
-  {g:"PODS DESCARTÁVEIS",m:"V300",s:"Icy Mint",q:4,p:160,c:70},
-  {g:"PODS DESCARTÁVEIS",m:"V300",s:"Strawberry Kiwi",q:0,p:160,c:70},
-  {g:"PODS DESCARTÁVEIS",m:"V300",s:"Blueberry Ice",q:4,p:160,c:70},
-  {g:"PODS DESCARTÁVEIS",m:"V155",s:"Green Apple",q:1,p:130,c:55},
-  {g:"PODS DESCARTÁVEIS",m:"V155",s:"Pineapple",q:0,p:130,c:55},
-  {g:"PODS DESCARTÁVEIS",m:"V155",s:"Grape Ice",q:1,p:130,c:55},
-  {g:"PODS DESCARTÁVEIS",m:"V155",s:"Strawberry Banana",q:2,p:130,c:55},
-  {g:"PODS DESCARTÁVEIS",m:"V155",s:"Strawberry Kiwi",q:7,p:130,c:55},
-  {g:"PODS DESCARTÁVEIS",m:"V155",s:"Strawberry Ice",q:4,p:130,c:55},
-  {g:"PODS DESCARTÁVEIS",m:"V155",s:"Icy Mint",q:2,p:130,c:55},
-  {g:"PODS DESCARTÁVEIS",m:"V155",s:"Kiwi Passion Fruit",q:2,p:130,c:55},
-  {g:"PODS DESCARTÁVEIS",m:"V155",s:"Blueberry",q:1,p:130,c:55},
-  {g:"PODS DESCARTÁVEIS",m:"V155",s:"Menthol",q:5,p:130,c:55},
-  {g:"PODS DESCARTÁVEIS",m:"V155",s:"Pineapple Ice",q:5,p:130,c:55},
-  {g:"PODS DESCARTÁVEIS",m:"V155",s:"Strawberry Watermelon",q:4,p:130,c:55},
-  {g:"PODS DESCARTÁVEIS",m:"V150",s:"Green Apple Peach Kiwi",q:1,p:120,c:52},
-  {g:"PODS DESCARTÁVEIS",m:"V150",s:"Icy Mint",q:0,p:120,c:52},
-  {g:"PODS DESCARTÁVEIS",m:"V150",s:"Berry Blast",q:2,p:120,c:52},
-  {g:"PODS DESCARTÁVEIS",m:"V150",s:"Watermelon Ice",q:5,p:120,c:52},
-  {g:"PODS DESCARTÁVEIS",m:"V150",s:"Cherry Ice",q:3,p:120,c:52},
-  {g:"PODS DESCARTÁVEIS",m:"V150",s:"Dragonfruit Lemonade",q:2,p:120,c:52},
-  {g:"PODS DESCARTÁVEIS",m:"V150",s:"Cherry Watermelon",q:6,p:120,c:52},
-  {g:"PODS DESCARTÁVEIS",m:"V150",s:"Green Apple",q:2,p:120,c:52},
-  {g:"PODS DESCARTÁVEIS",m:"V150",s:"Strawberry Apple Watermelon",q:1,p:120,c:52},
-  {g:"PODS DESCARTÁVEIS",m:"V150",s:"Strawberry Kiwi",q:1,p:120,c:52},
-  {g:"PODS DESCARTÁVEIS",m:"V150",s:"Strawberry Ice",q:1,p:120,c:52},
-  {g:"PODS DESCARTÁVEIS",m:"V150",s:"Cherry Banana",q:5,p:120,c:52},
-  {g:"PODS DESCARTÁVEIS",m:"V150",s:"Menthol",q:1,p:120,c:52},
-  {g:"PODS DESCARTÁVEIS",m:"V150",s:"Lemon Ice",q:3,p:120,c:52},
-  {g:"PODS DESCARTÁVEIS",m:"V150",s:"Grape Ice",q:2,p:120,c:52},
-  {g:"PODS DESCARTÁVEIS",m:"V80",s:"Menthol",q:6,p:110,c:50},
-  {g:"PODS DESCARTÁVEIS",m:"V80",s:"Blueberry Lemon",q:4,p:110,c:50},
-  {g:"PODS DESCARTÁVEIS",m:"V80",s:"Blueberry Ice",q:4,p:110,c:50},
-  {g:"PODS DESCARTÁVEIS",m:"V80",s:"Green Apple",q:8,p:110,c:50},
-  {g:"PODS DESCARTÁVEIS",m:"V80",s:"Watermelon Ice",q:5,p:110,c:50},
-  {g:"PODS DESCARTÁVEIS",m:"V80",s:"Strawberry Ice",q:5,p:110,c:50},
-  {g:"PODS DESCARTÁVEIS",m:"V80",s:"Strawberry Kiwi",q:9,p:110,c:50},
-  {g:"PODS DESCARTÁVEIS",m:"V80",s:"Icy Mint",q:5,p:110,c:50},
   {g:"PODS DESCARTÁVEIS",m:"V80",s:"Banana Cherry",q:2,p:110,c:50},
-  {g:"PODS DESCARTÁVEIS",m:"V80",s:"Grape Ice",q:5,p:110,c:50},
-  {g:"PODS DESCARTÁVEIS",m:"V80",s:"Spearmint Gum",q:3,p:110,c:50},
+  {g:"PODS DESCARTÁVEIS",m:"V80",s:"Blueberry",q:4,p:110,c:50},
+  {g:"PODS DESCARTÁVEIS",m:"V80",s:"Blueberry Lemon",q:4,p:110,c:50},
+  {g:"PODS DESCARTÁVEIS",m:"V80",s:"Grape",q:4,p:110,c:50},
+  {g:"PODS DESCARTÁVEIS",m:"V80",s:"Green Apple",q:8,p:110,c:50},
+  {g:"PODS DESCARTÁVEIS",m:"V80",s:"Icy Mint",q:3,p:110,c:50},
   {g:"PODS DESCARTÁVEIS",m:"V80",s:"Lime Mango",q:4,p:110,c:50},
-  {g:"PODS DESCARTÁVEIS",m:"V80",s:"Passion Fruit Sour Kiwi",q:5,p:110,c:50},
-  {g:"PODS DESCARTÁVEIS",m:"V400",s:"Mint",q:6,p:165,c:70},
-  {g:"PODS DESCARTÁVEIS",m:"V400",s:"Grape",q:6,p:165,c:70},
-  {g:"PODS DESCARTÁVEIS",m:"V400",s:"Menthol",q:5,p:165,c:70},
+  {g:"PODS DESCARTÁVEIS",m:"V80",s:"Menthol",q:6,p:110,c:50},
+  {g:"PODS DESCARTÁVEIS",m:"V80",s:"Passion Fruit Sour Kiwi",q:4,p:110,c:50},
+  {g:"PODS DESCARTÁVEIS",m:"V80",s:"Spearmint Gum",q:2,p:110,c:50},
+  {g:"PODS DESCARTÁVEIS",m:"V80",s:"Strawberry",q:5,p:110,c:50},
+  {g:"PODS DESCARTÁVEIS",m:"V80",s:"Strawberry Kiwi",q:6,p:110,c:50},
+  {g:"PODS DESCARTÁVEIS",m:"V80",s:"Watermelon",q:3,p:110,c:50},
+  {g:"PODS DESCARTÁVEIS",m:"V150",s:"Berry Blast",q:2,p:120,c:52},
+  {g:"PODS DESCARTÁVEIS",m:"V150",s:"Cherry",q:2,p:120,c:52},
+  {g:"PODS DESCARTÁVEIS",m:"V150",s:"Cherry Banana",q:4,p:120,c:52},
+  {g:"PODS DESCARTÁVEIS",m:"V150",s:"Cherry Watermelon",q:6,p:120,c:52},
+  {g:"PODS DESCARTÁVEIS",m:"V150",s:"Dragonfruit Lemonade",q:6,p:120,c:52},
+  {g:"PODS DESCARTÁVEIS",m:"V150",s:"Grape",q:7,p:120,c:52},
+  {g:"PODS DESCARTÁVEIS",m:"V150",s:"Green Apple",q:1,p:120,c:52},
+  {g:"PODS DESCARTÁVEIS",m:"V150",s:"Green Apple Peach Kiwi",q:1,p:120,c:52},
+  {g:"PODS DESCARTÁVEIS",m:"V150",s:"Icy Mint",q:8,p:120,c:52},
+  {g:"PODS DESCARTÁVEIS",m:"V150",s:"Lemon",q:3,p:120,c:52},
+  {g:"PODS DESCARTÁVEIS",m:"V150",s:"Menthol",q:10,p:120,c:52},
+  {g:"PODS DESCARTÁVEIS",m:"V150",s:"Pineapple",q:5,p:120,c:52},
+  {g:"PODS DESCARTÁVEIS",m:"V150",s:"Strawberry",q:2,p:120,c:52},
+  {g:"PODS DESCARTÁVEIS",m:"V150",s:"Strawberry Apple Watermelon",q:1,p:120,c:52},
+  {g:"PODS DESCARTÁVEIS",m:"V150",s:"Strawberry Kiwi",q:7,p:120,c:52},
+  {g:"PODS DESCARTÁVEIS",m:"V150",s:"Strawberry Watermelon",q:5,p:120,c:52},
+  {g:"PODS DESCARTÁVEIS",m:"V150",s:"Watermelon",q:5,p:120,c:52},
+  {g:"PODS DESCARTÁVEIS",m:"V155",s:"Banana",q:5,p:130,c:55},
+  {g:"PODS DESCARTÁVEIS",m:"V155",s:"Blueberry",q:9,p:130,c:55},
+  {g:"PODS DESCARTÁVEIS",m:"V155",s:"Grape",q:4,p:130,c:55},
+  {g:"PODS DESCARTÁVEIS",m:"V155",s:"Grape Ice",q:5,p:130,c:55},
+  {g:"PODS DESCARTÁVEIS",m:"V155",s:"Green Apple",q:6,p:130,c:55},
+  {g:"PODS DESCARTÁVEIS",m:"V155",s:"Icy Mint",q:12,p:130,c:55},
+  {g:"PODS DESCARTÁVEIS",m:"V155",s:"Kiwi Passion Fruit",q:6,p:130,c:55},
+  {g:"PODS DESCARTÁVEIS",m:"V155",s:"Menthol",q:9,p:130,c:55},
+  {g:"PODS DESCARTÁVEIS",m:"V155",s:"Pineapple",q:9,p:130,c:55},
+  {g:"PODS DESCARTÁVEIS",m:"V155",s:"Strawberry",q:2,p:130,c:55},
+  {g:"PODS DESCARTÁVEIS",m:"V155",s:"Strawberry Banana",q:6,p:130,c:55},
+  {g:"PODS DESCARTÁVEIS",m:"V155",s:"Strawberry Kiwi",q:5,p:130,c:55},
+  {g:"PODS DESCARTÁVEIS",m:"V155",s:"Strawberry Watermelon",q:4,p:130,c:55},
+  {g:"PODS DESCARTÁVEIS",m:"V155",s:"Watermelon",q:10,p:130,c:55},
+  {g:"PODS DESCARTÁVEIS",m:"V250",s:"Banana",q:1,p:140,c:62},
+  {g:"PODS DESCARTÁVEIS",m:"V250",s:"Blueberry",q:3,p:140,c:62},
+  {g:"PODS DESCARTÁVEIS",m:"V250",s:"Grape",q:16,p:140,c:62},
+  {g:"PODS DESCARTÁVEIS",m:"V250",s:"Green Apple",q:4,p:140,c:62},
+  {g:"PODS DESCARTÁVEIS",m:"V250",s:"Icy Mint",q:15,p:140,c:62},
+  {g:"PODS DESCARTÁVEIS",m:"V250",s:"Menthol",q:15,p:140,c:62},
+  {g:"PODS DESCARTÁVEIS",m:"V250",s:"Pineapple",q:9,p:140,c:62},
+  {g:"PODS DESCARTÁVEIS",m:"V250",s:"Strawberry",q:11,p:140,c:62},
+  {g:"PODS DESCARTÁVEIS",m:"V250",s:"Strawberry Kiwi",q:4,p:140,c:62},
+  {g:"PODS DESCARTÁVEIS",m:"V250",s:"Watermelon",q:11,p:140,c:62},
+  {g:"PODS DESCARTÁVEIS",m:"V300",s:"Banana",q:5,p:160,c:70},
+  {g:"PODS DESCARTÁVEIS",m:"V300",s:"Blueberry",q:13,p:160,c:70},
+  {g:"PODS DESCARTÁVEIS",m:"V300",s:"Grape",q:12,p:160,c:70},
+  {g:"PODS DESCARTÁVEIS",m:"V300",s:"Green Apple",q:4,p:160,c:70},
+  {g:"PODS DESCARTÁVEIS",m:"V300",s:"Icy Mint",q:10,p:160,c:70},
+  {g:"PODS DESCARTÁVEIS",m:"V300",s:"Menthol",q:15,p:160,c:70},
+  {g:"PODS DESCARTÁVEIS",m:"V300",s:"Pineapple",q:5,p:160,c:70},
+  {g:"PODS DESCARTÁVEIS",m:"V300",s:"Strawberry",q:14,p:160,c:70},
+  {g:"PODS DESCARTÁVEIS",m:"V300",s:"Strawberry Banana",q:11,p:160,c:70},
+  {g:"PODS DESCARTÁVEIS",m:"V300",s:"Strawberry Kiwi",q:10,p:160,c:70},
+  {g:"PODS DESCARTÁVEIS",m:"V300",s:"Watermelon",q:13,p:160,c:70},
+  {g:"PODS DESCARTÁVEIS",m:"V300",s:"Watermelon Mix",q:5,p:160,c:70},
   {g:"PODS DESCARTÁVEIS",m:"V400",s:"Blueberry",q:8,p:165,c:70},
+  {g:"PODS DESCARTÁVEIS",m:"V400",s:"Grape",q:5,p:165,c:70},
   {g:"PODS DESCARTÁVEIS",m:"V400",s:"Grape Peach",q:6,p:165,c:70},
-  {g:"PODS DESCARTÁVEIS",m:"V400",s:"Strawberry Watermelon",q:4,p:165,c:70},
+  {g:"PODS DESCARTÁVEIS",m:"V400",s:"Menthol",q:5,p:165,c:70},
+  {g:"PODS DESCARTÁVEIS",m:"V400",s:"Mint",q:3,p:165,c:70},
   {g:"PODS DESCARTÁVEIS",m:"V400",s:"Pineapple",q:5,p:165,c:70},
-  {g:"PODS DESCARTÁVEIS",m:"V400",s:"Strawberry Banana",q:4,p:165,c:70},
+  {g:"PODS DESCARTÁVEIS",m:"V400",s:"Strawberry Banana",q:3,p:165,c:70},
   {g:"PODS DESCARTÁVEIS",m:"V400",s:"Strawberry Kiwi",q:4,p:165,c:70},
-  {g:"PODS DESCARTÁVEIS",m:"V400",s:"Watermelon Ice",q:5,p:165,c:70},
-  {g:"PODS DESCARTÁVEIS",m:"V-Mix",s:"Grape Ice / Watermelon Ice",q:5,p:170,c:75},
-  {g:"PODS DESCARTÁVEIS",m:"V-Mix",s:"Apple Ice / Strawberry Watermelon",q:4,p:170,c:75},
-  {g:"PODS DESCARTÁVEIS",m:"V-Mix",s:"Grape Ice / Strawberry",q:3,p:170,c:75},
-  {g:"PODS DESCARTÁVEIS",m:"V-Mix",s:"Banana Ice / Strawberry Ice",q:0,p:170,c:75},
-  {g:"PODS DESCARTÁVEIS",m:"V-Mix",s:"Watermelon Ice / Cherry Ice",q:3,p:170,c:75},
-  {g:"PODS DESCARTÁVEIS",m:"P100",s:"Baterias",q:3,p:100,c:42},
-  {g:"PODS DESCARTÁVEIS",m:"P100",s:"Blueberry",q:9,p:100,c:42},
-  {g:"PODS DESCARTÁVEIS",m:"P100",s:"Grape Ice",q:6,p:100,c:42},
-  {g:"PODS DESCARTÁVEIS",m:"P100",s:"Strawberry Kiwi",q:5,p:100,c:42},
+  {g:"PODS DESCARTÁVEIS",m:"V400",s:"Strawberry Watermelon",q:4,p:165,c:70},
+  {g:"PODS DESCARTÁVEIS",m:"V400",s:"Watermelon",q:3,p:165,c:70},
+  {g:"PODS DESCARTÁVEIS",m:"V-Mix",s:"Apple / Strawberry Watermelon",q:4,p:170,c:75},
+  {g:"PODS DESCARTÁVEIS",m:"V-Mix",s:"Banana / Strawberry",q:5,p:170,c:75},
+  {g:"PODS DESCARTÁVEIS",m:"V-Mix",s:"Grape / Strawberry",q:2,p:170,c:75},
+  {g:"PODS DESCARTÁVEIS",m:"V-Mix",s:"Grape / Watermelon",q:4,p:170,c:75},
+  {g:"PODS DESCARTÁVEIS",m:"V-Mix",s:"Icy Mint / Peach Grape",q:4,p:170,c:75},
+  {g:"PODS DESCARTÁVEIS",m:"V-Mix",s:"Watermelon / Cherry",q:2,p:170,c:75},
+  {g:"PODS DESCARTÁVEIS",m:"P100",s:"Banana",q:11,p:100,c:42},
+  {g:"PODS DESCARTÁVEIS",m:"P100",s:"Blueberry",q:10,p:100,c:42},
+  {g:"PODS DESCARTÁVEIS",m:"P100",s:"Grape",q:10,p:100,c:42},
   {g:"PODS DESCARTÁVEIS",m:"P100",s:"Green Apple",q:7,p:100,c:42},
-  {g:"PODS DESCARTÁVEIS",m:"P100",s:"Banana",q:6,p:100,c:42},
-  {g:"PODS DESCARTÁVEIS",m:"P100",s:"Watermelon",q:4,p:100,c:42},
   {g:"PODS DESCARTÁVEIS",m:"P100",s:"Pineapple",q:1,p:100,c:42},
-  {g:"PODS DESCARTÁVEIS",m:"P100",s:"Strawberry Ice",q:1,p:100,c:42},
-  {g:"PODS DESCARTÁVEIS",m:"Nikbar 10k",s:"Menthol",q:1,p:80,c:36},
+  {g:"PODS DESCARTÁVEIS",m:"P100",s:"Strawberry",q:1,p:100,c:42},
+  {g:"PODS DESCARTÁVEIS",m:"P100",s:"Strawberry Kiwi",q:10,p:100,c:42},
+  {g:"PODS DESCARTÁVEIS",m:"P100",s:"Watermelon",q:6,p:100,c:42},
+  {g:"PODS DESCARTÁVEIS",m:"Nikbar 10k",s:"Blueberry",q:1,p:80,c:36},
+  {g:"PODS DESCARTÁVEIS",m:"Nikbar 10k",s:"Grape",q:3,p:80,c:36},
+  {g:"PODS DESCARTÁVEIS",m:"Nikbar 10k",s:"Grape Ice",q:5,p:80,c:36},
+  {g:"PODS DESCARTÁVEIS",m:"Nikbar 10k",s:"Icy Mint",q:8,p:80,c:36},
   {g:"PODS DESCARTÁVEIS",m:"Nikbar 10k",s:"Pineapple",q:1,p:80,c:36},
   {g:"PODS DESCARTÁVEIS",m:"Nikbar 10k",s:"Sakura Grape",q:1,p:80,c:36},
-  {g:"PODS DESCARTÁVEIS",m:"Nikbar 10k",s:"Icy Mint",q:10,p:80,c:36},
-  {g:"PODS DESCARTÁVEIS",m:"Nikbar 10k",s:"Strawberry Ice",q:5,p:80,c:36},
-  {g:"PODS DESCARTÁVEIS",m:"Nikbar 10k",s:"Strawberry Banana",q:3,p:80,c:36},
-  {g:"PODS DESCARTÁVEIS",m:"Nikbar 10k",s:"Blueberry Ice",q:2,p:80,c:36},
-  {g:"PODS DESCARTÁVEIS",m:"Nikbar 10k",s:"Strawberry Kiwi",q:4,p:80,c:36},
-  {g:"PODS DESCARTÁVEIS",m:"Elfbar 30k",s:"Watermelon Ice",q:5,p:140,c:60},
-  {g:"PODS DESCARTÁVEIS",m:"Elfbar 30k",s:"Spearmint",q:2,p:140,c:60},
-  {g:"PODS DESCARTÁVEIS",m:"Elfbar 30k",s:"Bubaloo Grape",q:3,p:140,c:60},
-  {g:"PODS DESCARTÁVEIS",m:"Elfbar 30k",s:"Strawberry Ice",q:10,p:140,c:60},
-  {g:"PODS DESCARTÁVEIS",m:"Elfbar 30k",s:"Green Apple",q:5,p:140,c:60},
-  {g:"PODS DESCARTÁVEIS",m:"Elfbar 30k",s:"Menthol",q:3,p:140,c:60},
-  {g:"PODS DESCARTÁVEIS",m:"Elfbar 15k",s:"Kiwi Watermelon Apple",q:7,p:100,c:43},
-  {g:"PODS DESCARTÁVEIS",m:"Elfbar 15k",s:"Sour Apple Ice",q:6,p:100,c:43},
-  {g:"PODS DESCARTÁVEIS",m:"Elfbar 15k",s:"Strawberry Kiwi",q:5,p:100,c:43},
-  {g:"PODS DESCARTÁVEIS",m:"Elfbar 15k",s:"Peach Mango Watermelon",q:1,p:100,c:43},
-  {g:"PODS DESCARTÁVEIS",m:"Elfbar 15k",s:"Miami Mint",q:1,p:100,c:43},
-  {g:"PODS DESCARTÁVEIS",m:"Elfbar 15k",s:"Strawberry Ice",q:1,p:100,c:43},
-  {g:"PODS DESCARTÁVEIS",m:"Geekbar 25k",s:"Bluerazz Ice",q:4,p:100,c:50},
-  {g:"PODS DESCARTÁVEIS",m:"Geekbar 25k",s:"Miami Mint",q:4,p:100,c:50},
-  {g:"PODS DESCARTÁVEIS",m:"Oxbar 25k",s:"Mix Berries",q:1,p:110,c:44},
-  {g:"PODS DESCARTÁVEIS",m:"Oxbar 25k",s:"Watermelon Slushie",q:3,p:110,c:44},
-  {g:"PODS DESCARTÁVEIS",m:"Oxbar 25k",s:"Strawberry Bubblegum",q:4,p:110,c:44},
-  {g:"PODS DESCARTÁVEIS",m:"Oxbar 25k",s:"Blueberry Raspberry",q:2,p:110,c:44},
-  {g:"PODS DESCARTÁVEIS",m:"Nikbar 25k",s:"Tripple Berry Ice",q:2,p:100,c:50},
-  {g:"PODS DESCARTÁVEIS",m:"Nikbar 30k",s:"Strawberry Apple Watermelon",q:2,p:115,c:46},
-  {g:"PODS DESCARTÁVEIS",m:"Nikbar 30k",s:"Strawberry Ice",q:4,p:115,c:46},
-  {g:"PODS DESCARTÁVEIS",m:"Nikbar 30k",s:"Cherry Banana",q:4,p:115,c:46},
+  {g:"PODS DESCARTÁVEIS",m:"Nikbar 10k",s:"Strawberry",q:10,p:80,c:36},
+  {g:"PODS DESCARTÁVEIS",m:"Nikbar 10k",s:"Strawberry Banana",q:2,p:80,c:36},
+  {g:"PODS DESCARTÁVEIS",m:"Nikbar 10k",s:"Strawberry Kiwi",q:8,p:80,c:36},
+  {g:"PODS DESCARTÁVEIS",m:"Nikbar 10k",s:"Watermelon",q:9,p:80,c:36},
+  {g:"PODS DESCARTÁVEIS",m:"Nikbar 25k",s:"Triple Berry",q:1,p:100,c:50},
+  {g:"PODS DESCARTÁVEIS",m:"Nikbar 30k",s:"Blueberry",q:3,p:115,c:46},
+  {g:"PODS DESCARTÁVEIS",m:"Nikbar 30k",s:"Cherry Banana",q:3,p:115,c:46},
+  {g:"PODS DESCARTÁVEIS",m:"Nikbar 30k",s:"Grape",q:5,p:115,c:46},
+  {g:"PODS DESCARTÁVEIS",m:"Nikbar 30k",s:"Icy Mint",q:5,p:115,c:46},
   {g:"PODS DESCARTÁVEIS",m:"Nikbar 30k",s:"Menthol",q:2,p:115,c:46},
+  {g:"PODS DESCARTÁVEIS",m:"Nikbar 30k",s:"Strawberry",q:7,p:115,c:46},
+  {g:"PODS DESCARTÁVEIS",m:"Nikbar 30k",s:"Strawberry Apple Watermelon",q:2,p:115,c:46},
+  {g:"PODS DESCARTÁVEIS",m:"Nikbar 30k",s:"Strawberry Kiwi",q:5,p:115,c:46},
+  {g:"PODS DESCARTÁVEIS",m:"Nikbar 30k",s:"Watermelon",q:5,p:115,c:46},
   {g:"PODS DESCARTÁVEIS",m:"Nikbar 30k",s:"Watermelon Cherry",q:1,p:115,c:46},
-  {g:"PODS DESCARTÁVEIS",m:"The Blacksheep 40k",s:"Grape / Menthol",q:2,p:170,c:80},
-  {g:"PODS DESCARTÁVEIS",m:"The Blacksheep 40k",s:"Strawberry Kiwi / Fresh Mint",q:2,p:170,c:80},
-  {g:"PODS RECARREGÁVEIS",m:"Xros Mini",s:"—",q:14,p:170,c:66},
-  {g:"RESISTÊNCIAS",m:"Coil Xros 0.8",s:"—",q:33,p:30,c:15},
-  {g:"RESISTÊNCIAS",m:"Coil Xros 0.6",s:"—",q:44,p:30,c:15},
-  {g:"RESISTÊNCIAS",m:"Coil Renova Zero",s:"—",q:0,p:30,c:15},
-  {g:"ESSÊNCIAS",m:"Migo",s:"Apple Ice 35mg",q:3,p:50,c:22},
-  {g:"ESSÊNCIAS",m:"Migo",s:"Melãozin Brabo 35mg",q:1,p:50,c:22},
-  {g:"ESSÊNCIAS",m:"Migo",s:"Melãozin Brabo 50mg",q:2,p:50,c:22},
-  {g:"ESSÊNCIAS",m:"Migo",s:"BluBlu 20mg",q:1,p:50,c:22},
-  {g:"ESSÊNCIAS",m:"Migo",s:"BluBlu 35mg",q:2,p:50,c:22},
-  {g:"ESSÊNCIAS",m:"Migo",s:"BluBlu 50mg",q:2,p:50,c:22},
-  {g:"ESSÊNCIAS",m:"Migo",s:"Moranguim Kiwi 35mg",q:2,p:50,c:22},
-  {g:"ESSÊNCIAS",m:"Migo",s:"Moranguim Kiwi 50mg",q:1,p:50,c:22},
-  {g:"ESSÊNCIAS",m:"Migo",s:"Melancinha Boom 35mg",q:2,p:50,c:22},
-  {g:"ESSÊNCIAS",m:"Migo",s:"Manga Vibe 20mg",q:1,p:50,c:22},
-  {g:"ESSÊNCIAS",m:"Migo",s:"Manga Vibe 50mg",q:4,p:50,c:22},
-  {g:"ESSÊNCIAS",m:"Migo",s:"Uvinha Braba 35mg",q:0,p:50,c:22},
-  {g:"ESSÊNCIAS",m:"Migo",s:"Uvinha Braba 50mg",q:2,p:50,c:22},
+  {g:"PODS DESCARTÁVEIS",m:"Elfbar 15k",s:"Kiwi Watermelon Apple",q:7,p:100,c:43},
+  {g:"PODS DESCARTÁVEIS",m:"Elfbar 15k",s:"Peach Mango Watermelon",q:1,p:100,c:43},
+  {g:"PODS DESCARTÁVEIS",m:"Elfbar 15k",s:"Sour Apple",q:6,p:100,c:43},
+  {g:"PODS DESCARTÁVEIS",m:"Elfbar 15k",s:"Strawberry Kiwi",q:5,p:100,c:43},
+  {g:"PODS DESCARTÁVEIS",m:"Elfbar 30k",s:"Bubaloo Grape",q:12,p:140,c:60},
+  {g:"PODS DESCARTÁVEIS",m:"Elfbar 30k",s:"Elf Love",q:4,p:140,c:60},
+  {g:"PODS DESCARTÁVEIS",m:"Elfbar 30k",s:"Green Apple",q:5,p:140,c:60},
+  {g:"PODS DESCARTÁVEIS",m:"Elfbar 30k",s:"Menthol",q:2,p:140,c:60},
+  {g:"PODS DESCARTÁVEIS",m:"Elfbar 30k",s:"Miami Mint",q:9,p:140,c:60},
+  {g:"PODS DESCARTÁVEIS",m:"Elfbar 30k",s:"Pineapple",q:3,p:140,c:60},
+  {g:"PODS DESCARTÁVEIS",m:"Elfbar 30k",s:"Spearmint",q:1,p:140,c:60},
+  {g:"PODS DESCARTÁVEIS",m:"Elfbar 30k",s:"Strawberry",q:7,p:140,c:60},
+  {g:"PODS DESCARTÁVEIS",m:"Elfbar 30k",s:"Watermelon",q:4,p:140,c:60},
+  {g:"PODS DESCARTÁVEIS",m:"Geekbar 25k",s:"Bluerazz",q:2,p:100,c:50},
+  {g:"PODS DESCARTÁVEIS",m:"Geekbar 25k",s:"Miami Mint",q:4,p:100,c:50},
+  {g:"PODS DESCARTÁVEIS",m:"Geekbar 35k",s:"Grape",q:10,p:125,c:43},
+  {g:"PODS DESCARTÁVEIS",m:"Geekbar 35k",s:"Mint",q:10,p:125,c:43},
+  {g:"PODS DESCARTÁVEIS",m:"Geekbar 35k",s:"Strawberry",q:10,p:125,c:43},
+  {g:"PODS DESCARTÁVEIS",m:"Geekbar 35k",s:"Strawberry Kiwi",q:10,p:125,c:43},
+  {g:"PODS DESCARTÁVEIS",m:"Geekbar 35k",s:"Watermelon",q:10,p:125,c:43},
+  {g:"PODS DESCARTÁVEIS",m:"Lostmary 35k",s:"Grape",q:10,p:130,c:43},
+  {g:"PODS DESCARTÁVEIS",m:"Lostmary 35k",s:"Menthol",q:10,p:130,c:43},
+  {g:"PODS DESCARTÁVEIS",m:"Lostmary 35k",s:"Strawberry",q:10,p:130,c:43},
+  {g:"PODS DESCARTÁVEIS",m:"Lostmary 35k",s:"Strawberry Kiwi",q:10,p:130,c:43},
+  {g:"PODS DESCARTÁVEIS",m:"Lostmary 35k",s:"Watermelon",q:10,p:130,c:43},
+  {g:"PODS DESCARTÁVEIS",m:"Oxbar 25k",s:"Blueberry Raspberry",q:1,p:110,c:44},
+  {g:"PODS DESCARTÁVEIS",m:"Oxbar 25k",s:"Mix Berries",q:1,p:110,c:44},
+  {g:"PODS DESCARTÁVEIS",m:"Oxbar 25k",s:"Strawberry",q:4,p:110,c:44},
+  {g:"PODS DESCARTÁVEIS",m:"Oxbar 25k",s:"Watermelon",q:4,p:110,c:44},
+  {g:"PODS DESCARTÁVEIS",m:"The Blacksheep 40k",s:"Grape / Menthol",q:1,p:170,c:80},
+  {g:"PODS DESCARTÁVEIS",m:"The Blacksheep 40k",s:"Strawberry Kiwi / Fresh Mint",q:1,p:170,c:80},
+  {g:"PODS RECARREGÁVEIS",m:"Xros Mini",s:"Black",q:4,p:170,c:66},
+  {g:"PODS RECARREGÁVEIS",m:"Xros Mini",s:"Blue",q:2,p:170,c:66},
+  {g:"PODS RECARREGÁVEIS",m:"Xros Mini",s:"Green",q:2,p:170,c:66},
+  {g:"PODS RECARREGÁVEIS",m:"Xros Mini",s:"Pink",q:2,p:170,c:66},
+  {g:"PODS RECARREGÁVEIS",m:"Xros Mini",s:"Purple",q:2,p:170,c:66},
+  {g:"PODS RECARREGÁVEIS",m:"Vaporesso Xros 5",s:"Black",q:1,p:290,c:139},
+  {g:"RESISTÊNCIAS",m:"Coil Xros 0.6",s:"—",q:35,p:30,c:15},
+  {g:"RESISTÊNCIAS",m:"Coil Xros 0.7",s:"—",q:37,p:30,c:15},
+  {g:"RESISTÊNCIAS",m:"Coil Xros 0.8",s:"—",q:22,p:30,c:15},
+  {g:"ESSÊNCIAS",m:"Migo",s:"Apple 35mg",q:5,p:50,c:22},
+  {g:"ESSÊNCIAS",m:"Migo",s:"Apple 50mg",q:2,p:50,c:22},
+  {g:"ESSÊNCIAS",m:"Migo",s:"BluBlu 20mg",q:2,p:50,c:22},
+  {g:"ESSÊNCIAS",m:"Migo",s:"BluBlu 35mg",q:5,p:50,c:22},
+  {g:"ESSÊNCIAS",m:"Migo",s:"BluBlu 50mg",q:5,p:50,c:22},
+  {g:"ESSÊNCIAS",m:"Migo",s:"Frambo Fresh 20mg",q:5,p:50,c:22},
+  {g:"ESSÊNCIAS",m:"Migo",s:"Frambo Fresh 35mg",q:5,p:50,c:22},
+  {g:"ESSÊNCIAS",m:"Migo",s:"Frambo Fresh 50mg",q:5,p:50,c:22},
+  {g:"ESSÊNCIAS",m:"Migo",s:"Manga 20mg",q:5,p:50,c:22},
+  {g:"ESSÊNCIAS",m:"Migo",s:"Manga 35mg",q:3,p:50,c:22},
+  {g:"ESSÊNCIAS",m:"Migo",s:"Manga 50mg",q:4,p:50,c:22},
+  {g:"ESSÊNCIAS",m:"Migo",s:"Melãozim 35mg",q:3,p:50,c:22},
+  {g:"ESSÊNCIAS",m:"Migo",s:"Melãozim 50mg",q:4,p:50,c:22},
+  {g:"ESSÊNCIAS",m:"Migo",s:"Menta Antártida 35mg",q:5,p:50,c:22},
+  {g:"ESSÊNCIAS",m:"Migo",s:"Menta Antártida 50mg",q:1,p:50,c:22},
+  {g:"ESSÊNCIAS",m:"Migo",s:"Morangou 20mg",q:4,p:50,c:22},
+  {g:"ESSÊNCIAS",m:"Migo",s:"Morangou 35mg",q:3,p:50,c:22},
+  {g:"ESSÊNCIAS",m:"Migo",s:"Morangou 50mg",q:4,p:50,c:22},
+  {g:"ESSÊNCIAS",m:"Migo",s:"Moranguim Kiwi 20mg",q:4,p:50,c:22},
+  {g:"ESSÊNCIAS",m:"Migo",s:"Moranguim Kiwi 35mg",q:4,p:50,c:22},
+  {g:"ESSÊNCIAS",m:"Migo",s:"Moranguim Kiwi 50mg",q:4,p:50,c:22},
+  {g:"ESSÊNCIAS",m:"Migo",s:"Tangerina 35mg",q:2,p:50,c:22},
   {g:"ESSÊNCIAS",m:"Migo",s:"Tangerina 50mg",q:2,p:50,c:22},
-  {g:"ESSÊNCIAS",m:"Migo",s:"Frambo Fresh 35mg",q:3,p:50,c:22},
-  {g:"ESSÊNCIAS",m:"Migo",s:"Frambo Fresh 50mg",q:3,p:50,c:22},
-  {g:"ESSÊNCIAS",m:"Migo",s:"Morangou 20mg",q:2,p:50,c:22},
-  {g:"ESSÊNCIAS",m:"Migo",s:"Morangou 50mg",q:1,p:50,c:22},
-  {g:"ESSÊNCIAS",m:"Migo",s:"Menta Antártida 35mg",q:6,p:50,c:22},
-  {g:"ESSÊNCIAS",m:"Migo",s:"Menta Antártida 50mg",q:4,p:50,c:22},
-  {g:"ESSÊNCIAS",m:"Ignite",s:"Mango Grape Apple Pops",q:3,p:90,c:25},
-  {g:"ESSÊNCIAS",m:"Ignite",s:"Berry Banana Sundae",q:4,p:90,c:25},
-  {g:"ESSÊNCIAS",m:"Ignite",s:"Strawberry Frost",q:3,p:90,c:25},
+  {g:"ESSÊNCIAS",m:"Migo",s:"Uvinha 35mg",q:3,p:50,c:22},
+  {g:"ESSÊNCIAS",m:"Migo",s:"Uvinha 50mg",q:5,p:50,c:22},
+  {g:"ESSÊNCIAS",m:"Migo",s:"Watermelon 20mg",q:5,p:50,c:22},
+  {g:"ESSÊNCIAS",m:"Migo",s:"Watermelon 35mg",q:5,p:50,c:22},
+  {g:"ESSÊNCIAS",m:"Migo",s:"Watermelon 50mg",q:5,p:50,c:22},
   {g:"ESSÊNCIAS",m:"Ignite",s:"Banana Freeze",q:4,p:90,c:25},
+  {g:"ESSÊNCIAS",m:"Ignite",s:"Berry Banana Sundae",q:4,p:90,c:25},
+  {g:"ESSÊNCIAS",m:"Ignite",s:"Berry Kiwi Blast",q:2,p:90,c:25},
+  {g:"ESSÊNCIAS",m:"Ignite",s:"Berry Lemonade Chill",q:7,p:90,c:25},
   {g:"ESSÊNCIAS",m:"Ignite",s:"Grape Passion Slush",q:3,p:90,c:25},
-  {g:"ESSÊNCIAS",m:"Ignite",s:"Mango Passion Breeze",q:6,p:90,c:25},
-  {g:"ESSÊNCIAS",m:"Ignite",s:"Berry Kiwi Blast",q:3,p:90,c:25},
-  {g:"ESSÊNCIAS",m:"Ignite",s:"Arctic Grape",q:1,p:90,c:25},
-  {g:"ESSÊNCIAS",m:"Ignite",s:"Berry Lemonade Chill",q:3,p:90,c:25},
-  {g:"ESSÊNCIAS",m:"Ignite",s:"Green Apple Blizzard",q:5,p:90,c:25},
-  {g:"ESSÊNCIAS",m:"BLVK",s:"Original Bubblegum 35mg",q:1,p:85,c:50},
+  {g:"ESSÊNCIAS",m:"Ignite",s:"Green Apple Blizzard",q:4,p:90,c:25},
+  {g:"ESSÊNCIAS",m:"Ignite",s:"Mango Grape Apple Pops",q:3,p:90,c:25},
+  {g:"ESSÊNCIAS",m:"Ignite",s:"Mango Passion Breeze",q:4,p:90,c:25},
+  {g:"ESSÊNCIAS",m:"Ignite",s:"Strawberry Frost",q:3,p:90,c:25},
   {g:"ESSÊNCIAS",m:"BLVK",s:"Grape Soda 35mg",q:2,p:85,c:50},
+  {g:"ESSÊNCIAS",m:"BLVK",s:"Strawberry Banana 35mg",q:1,p:85,c:50},
+  {g:"ESSÊNCIAS",m:"BLVK",s:"Strawberry Banana 50mg",q:1,p:85,c:50},
+  {g:"ESSÊNCIAS",m:"BLVK",s:"Strawberry Lemonade 50mg",q:1,p:85,c:50},
   {g:"ESSÊNCIAS",m:"BLVK",s:"Watermelon Menthol 35mg",q:1,p:85,c:50},
   {g:"ESSÊNCIAS",m:"BLVK",s:"Watermelon Taffy 35mg",q:4,p:85,c:50},
-  {g:"ESSÊNCIAS",m:"BLVK",s:"Strawberry Banana Ice 35mg",q:2,p:85,c:50},
-  {g:"ESSÊNCIAS",m:"BLVK",s:"Strawberry Banana Ice 50mg",q:2,p:85,c:50},
-  {g:"ESSÊNCIAS",m:"BLVK",s:"Strawberry Lemonade 50mg",q:1,p:85,c:50},
-  {g:"ESSÊNCIAS",m:"BLVK",s:"Strawberry Peach 50mg",q:1,p:85,c:50},
-  {g:"ESSÊNCIAS",m:"Magna",s:"Grape Gum 20mg",q:4,p:65,c:30},
-  {g:"ESSÊNCIAS",m:"Hypnos",s:"Spearmint 20mg",q:10,p:65,c:30},
-  {g:"ESSÊNCIAS",m:"Hypnos",s:"Spearmint 35mg",q:1,p:65,c:30},
-  {g:"ESSÊNCIAS",m:"Hypnos",s:"Spearmint 50mg",q:2,p:65,c:30},
-  {g:"ESSÊNCIAS",m:"Hypnos",s:"Spearmint Strawberry 20mg",q:2,p:65,c:30},
-  {g:"ESSÊNCIAS",m:"Hypnos",s:"Spearmint Strawberry 35mg",q:1,p:65,c:30},
-  {g:"ESSÊNCIAS",m:"Hypnos",s:"Spearmint Strawberry 50mg",q:1,p:65,c:30},
+  {g:"ESSÊNCIAS",m:"Magna",s:"Grape Gum 35mg",q:3,p:65,c:32},
+  {g:"ESSÊNCIAS",m:"Hypnos",s:"Energy 35mg",q:2,p:65,c:30},
+  {g:"ESSÊNCIAS",m:"Hypnos",s:"Spearmint 20mg",q:8,p:65,c:30},
+  {g:"ESSÊNCIAS",m:"Hypnos",s:"Spearmint 50mg",q:1,p:65,c:30},
+  {g:"ESSÊNCIAS",m:"Hypnos",s:"Spearmint Apple 35mg",q:2,p:65,c:30},
   {g:"ESSÊNCIAS",m:"Hypnos",s:"Spearmint Berries 35mg",q:1,p:65,c:30},
   {g:"ESSÊNCIAS",m:"Hypnos",s:"Spearmint Berries 50mg",q:2,p:65,c:30},
-  {g:"ESSÊNCIAS",m:"Hypnos",s:"Spearmint Watermelon 20mg",q:2,p:65,c:30},
-  {g:"ESSÊNCIAS",m:"Hypnos",s:"Spearmint Watermelon 35mg",q:2,p:65,c:30},
-  {g:"ESSÊNCIAS",m:"Hypnos",s:"Spearmint Watermelon 50mg",q:2,p:65,c:30},
-  {g:"ESSÊNCIAS",m:"Hypnos",s:"Spearmint Apple 35mg",q:2,p:65,c:30},
-  {g:"ESSÊNCIAS",m:"Hypnos",s:"Spearmint Apple 50mg",q:1,p:65,c:30},
-  {g:"ESSÊNCIAS",m:"Hypnos",s:"Spearmint Cherry 35mg",q:0,p:65,c:30},
   {g:"ESSÊNCIAS",m:"Hypnos",s:"Spearmint Cherry 50mg",q:2,p:65,c:30},
-  {g:"ESSÊNCIAS",m:"Hypnos",s:"Spearmint Sour 35mg",q:1,p:65,c:30},
-  {g:"ESSÊNCIAS",m:"Hypnos",s:"Spearmint Grape 35mg",q:2,p:65,c:30},
-  {g:"ESSÊNCIAS",m:"Hypnos",s:"Spearmint Grape 50mg",q:2,p:65,c:30},
-  {g:"ESSÊNCIAS",m:"Hypnos",s:"Spearmint Lime 35mg",q:2,p:65,c:30},
+  {g:"ESSÊNCIAS",m:"Hypnos",s:"Spearmint Grape 35mg",q:4,p:65,c:30},
+  {g:"ESSÊNCIAS",m:"Hypnos",s:"Spearmint Grape 50mg",q:5,p:65,c:30},
+  {g:"ESSÊNCIAS",m:"Hypnos",s:"Spearmint Lichia 35mg",q:2,p:65,c:30},
+  {g:"ESSÊNCIAS",m:"Hypnos",s:"Spearmint Lime 35mg",q:1,p:65,c:30},
   {g:"ESSÊNCIAS",m:"Hypnos",s:"Spearmint Lime 50mg",q:1,p:65,c:30},
-  {g:"CHICLETE SLAPPLE",m:"Slapple",s:"Watermelon 2mg",q:0,p:90,c:40},
-  {g:"CHICLETE SLAPPLE",m:"Slapple",s:"Apple 4mg",q:1,p:90,c:40},
-  {g:"CHICLETE SLAPPLE",m:"Slapple",s:"Pineapple 4mg",q:2,p:90,c:40},
-  {g:"CHICLETE SLAPPLE",m:"Slapple",s:"Peach 4mg",q:2,p:90,c:40},
+  {g:"ESSÊNCIAS",m:"Hypnos",s:"Spearmint Mango 50mg",q:5,p:65,c:30},
+  {g:"ESSÊNCIAS",m:"Hypnos",s:"Spearmint Melon 35mg",q:3,p:65,c:30},
+  {g:"ESSÊNCIAS",m:"Hypnos",s:"Spearmint Melon 50mg",q:3,p:65,c:30},
+  {g:"ESSÊNCIAS",m:"Hypnos",s:"Spearmint Sour 35mg",q:4,p:65,c:30},
+  {g:"ESSÊNCIAS",m:"Hypnos",s:"Spearmint Sour 50mg",q:2,p:65,c:30},
+  {g:"ESSÊNCIAS",m:"Hypnos",s:"Spearmint Strawberry 20mg",q:5,p:65,c:30},
+  {g:"ESSÊNCIAS",m:"Hypnos",s:"Spearmint Strawberry 35mg",q:4,p:65,c:30},
+  {g:"ESSÊNCIAS",m:"Hypnos",s:"Spearmint Strawberry 50mg",q:4,p:65,c:30},
+  {g:"ESSÊNCIAS",m:"Hypnos",s:"Spearmint Watermelon 20mg",q:5,p:65,c:30},
+  {g:"ESSÊNCIAS",m:"Hypnos",s:"Spearmint Watermelon 35mg",q:3,p:65,c:30},
+  {g:"ESSÊNCIAS",m:"Hypnos",s:"Spearmint Watermelon 50mg",q:4,p:65,c:30},
+  {g:"CHICLETE SLAPPLE",m:"Slapple",s:"Lemon",q:4,p:90,c:25},
+  {g:"CHICLETE SLAPPLE",m:"Slapple",s:"Mint",q:4,p:90,c:25},
+  {g:"CHICLETE SLAPPLE",m:"Slapple",s:"Peach",q:2,p:90,c:25},
+  {g:"CHICLETE SLAPPLE",m:"Slapple",s:"Pineapple",q:2,p:90,c:25},
+  {g:"CHICLETE SLAPPLE",m:"Slapple",s:"Watermelon",q:4,p:90,c:25},
 ];
 
 // ════════════════════════════════════════
 //  SYNC — Google Sheets via Apps Script
 // ════════════════════════════════════════
 const SYNC_URL = 'https://script.google.com/macros/s/AKfycbyYKs4qhhPDF1BUEEiSnwp6wsgA4JJp3vYo-v0NsnD4V_Emmitqd7IzWMYXA3iyOPcH/exec';
+let syncTimer = null, lastSyncTime = null, syncOnline = true;
 
-// Verifica se a URL foi configurada
-function syncConfigured() {
-  return SYNC_URL && !SYNC_URL.startsWith('COLE_') && SYNC_URL.includes('script.google.com');
-}
-let syncTimer = null;
-let syncPending = false;
-let lastSyncTime = null;
-let syncOnline = true;
+function syncConfigured() { return SYNC_URL && SYNC_URL.includes('script.google.com'); }
 
 function setSyncStatus(status, msg) {
   const el = document.getElementById('sync-status');
   if (!el) return;
-  const configs = {
-    syncing: { icon:'🔄', text: msg||'Sincronizando...', color:'var(--blue)',   bg:'var(--blue-dim)',   border:'rgba(79,156,249,.25)' },
-    ok:      { icon:'☁️',  text: msg||'Sincronizado',    color:'var(--green)',  bg:'var(--green-dim)',  border:'rgba(34,211,160,.25)' },
-    error:   { icon:'⚠️',  text: msg||'Offline',         color:'var(--orange)', bg:'var(--orange-dim)', border:'rgba(249,115,22,.25)'  },
-    pending: { icon:'⏳',  text: msg||'Aguardando...',   color:'var(--yellow)', bg:'var(--yellow-dim)', border:'rgba(251,191,36,.25)'  },
+  const cfg = {
+    syncing:{icon:'🔄',text:msg||'Sincronizando...',color:'var(--blue)',  bg:'var(--blue-dim)',  border:'rgba(79,156,249,.25)'},
+    ok:     {icon:'☁️', text:msg||'Sincronizado',   color:'var(--green)', bg:'var(--green-dim)', border:'rgba(34,211,160,.25)'},
+    error:  {icon:'⚠️', text:msg||'Offline',        color:'var(--orange)',bg:'var(--orange-dim)',border:'rgba(249,115,22,.25)'},
+    pending:{icon:'⏳', text:msg||'Aguardando...',  color:'var(--yellow)',bg:'var(--yellow-dim)',border:'rgba(251,191,36,.25)'},
   };
-  const c = configs[status] || configs.ok;
+  const c = cfg[status]||cfg.ok;
   el.innerHTML = `<span style="font-size:13px">${c.icon}</span><span style="font-size:11px;font-weight:600;color:${c.color}">${c.text}</span>`;
-  el.style.background  = c.bg;
-  el.style.borderColor = c.border;
+  el.style.background = c.bg; el.style.borderColor = c.border;
 }
 
-// Envia estado completo para o Google Sheets
-async function syncToCloud(immediate = false) {
+async function syncToCloud(immediate=false) {
   if (!syncConfigured()) { setSyncStatus('error','URL não configurada'); return; }
-  if (!immediate) {
-    clearTimeout(syncTimer);
-    syncTimer = setTimeout(() => syncToCloud(true), 2000);
-    setSyncStatus('pending');
-    return;
-  }
+  if (!immediate) { clearTimeout(syncTimer); syncTimer=setTimeout(()=>syncToCloud(true),2000); setSyncStatus('pending'); return; }
   setSyncStatus('syncing');
   try {
-    const payload = {
-      stock:      STATE.stock,
-      log:        STATE.log,
-      customCats: STATE.customCats || [],
-      updatedAt:  new Date().toISOString(),
-    };
-    // no-cors é necessário para Google Apps Script funcionar de domínios externos
-    await fetch(SYNC_URL, {
-      method:  'POST',
-      mode:    'no-cors',
-      headers: { 'Content-Type': 'text/plain' },
-      body:    JSON.stringify(payload),
-    });
-    // no-cors não retorna resposta legível — se não lançou erro, foi ok
-    lastSyncTime = new Date();
-    syncOnline = true;
-    const h = lastSyncTime.getHours().toString().padStart(2,'0');
-    const m = lastSyncTime.getMinutes().toString().padStart(2,'0');
-    const s = lastSyncTime.getSeconds().toString().padStart(2,'0');
-    setSyncStatus('ok', `Salvo às ${h}:${m}:${s}`);
-  } catch(e) {
-    syncOnline = false;
-    setSyncStatus('error', 'Sem conexão — salvo local');
-    console.warn('Sync error:', e);
-  }
+    await fetch(SYNC_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain'},
+      body:JSON.stringify({stock:STATE.stock,log:STATE.log,customCats:STATE.customCats||[],updatedAt:new Date().toISOString()})});
+    lastSyncTime=new Date(); syncOnline=true;
+    const t=lastSyncTime; setSyncStatus('ok',`Salvo às ${String(t.getHours()).padStart(2,'0')}:${String(t.getMinutes()).padStart(2,'0')}:${String(t.getSeconds()).padStart(2,'0')}`);
+  } catch(e) { syncOnline=false; setSyncStatus('error','Sem conexão — salvo local'); }
 }
 
-// Busca estado mais recente da nuvem
 async function syncFromCloud() {
-  if (!syncConfigured()) { setSyncStatus('error','Configure a URL do Apps Script'); return; }
-  setSyncStatus('syncing', 'Buscando dados...');
+  if (!syncConfigured()) { setSyncStatus('error','Configure a URL'); return; }
+  setSyncStatus('syncing','Buscando dados...');
   try {
-    // Usa proxy para contornar CORS no GET
-    const proxyUrl = 'https://corsproxy.io/?' + encodeURIComponent(SYNC_URL + '?t=' + Date.now());
-    const res = await fetch(proxyUrl);
-    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const res = await fetch('https://corsproxy.io/?'+encodeURIComponent(SYNC_URL+'?t='+Date.now()));
+    if (!res.ok) throw new Error('HTTP '+res.status);
     const text = await res.text();
-    if (!text || text === '{}' || text.trim() === '') {
-      setSyncStatus('ok', 'Nuvem vazia — enviando dados locais');
-      await syncToCloud(true);
-      return;
-    }
+    if (!text||text==='{}'||!text.trim()) { setSyncStatus('ok','Nuvem vazia — enviando'); await syncToCloud(true); return; }
     const cloud = JSON.parse(text);
-    if (!cloud.updatedAt) {
-      setSyncStatus('ok', 'Nuvem sem dados — usando local');
-      await syncToCloud(true);
-      return;
-    }
+    if (!cloud.updatedAt) { await syncToCloud(true); return; }
     const cloudTime = new Date(cloud.updatedAt).getTime();
-    const localRaw  = localStorage.getItem('up_updated_at');
-    const localTime = localRaw ? new Date(localRaw).getTime() : 0;
-
+    const localTime = new Date(localStorage.getItem('up_updated_at')||0).getTime();
     if (cloudTime > localTime) {
-      STATE.stock      = cloud.stock      || STATE.stock;
-      STATE.log        = cloud.log        || STATE.log;
-      STATE.customCats = cloud.customCats || STATE.customCats;
-      saveStateLocal();
-      syncOnline = true;
-      setSyncStatus('ok', 'Dados atualizados ☁️');
-      const activePage = document.querySelector('.page.active');
-      if (activePage) renderPage(activePage.id.replace('page-',''));
-      refreshAllCatSelects && refreshAllCatSelects();
-      updateBadge && updateBadge();
-    } else {
-      syncOnline = true;
-      await syncToCloud(true);
-    }
-  } catch(e) {
-    syncOnline = false;
-    setSyncStatus('error', 'Offline — dados locais');
-    console.warn('Sync from cloud error:', e);
-  }
-}
-
-// Salva apenas no localStorage (sem mandar pra nuvem)
-function saveStateLocal() {
-  localStorage.setItem('up_stock',      JSON.stringify(STATE.stock));
-  localStorage.setItem('up_log',        JSON.stringify(STATE.log));
-  localStorage.setItem('up_cats',       JSON.stringify(STATE.customCats||[]));
-  localStorage.setItem('up_updated_at', new Date().toISOString());
+      STATE.stock=cloud.stock||STATE.stock; STATE.log=cloud.log||STATE.log; STATE.customCats=cloud.customCats||STATE.customCats;
+      saveStateLocal(); syncOnline=true; setSyncStatus('ok','Atualizado da nuvem ☁️');
+      const ap=document.querySelector('.page.active'); if(ap) renderPage(ap.id.replace('page-',''));
+      typeof refreshAllCatSelects==='function'&&refreshAllCatSelects();
+      typeof updateBadge==='function'&&updateBadge();
+    } else { syncOnline=true; await syncToCloud(true); }
+  } catch(e) { syncOnline=false; setSyncStatus('error','Offline — dados locais'); }
 }
 
 // ════════════════════════════════════════
@@ -1301,18 +1275,18 @@ function saveStateLocal() {
 // ════════════════════════════════════════
 function loadState() {
   return {
-    stock:      JSON.parse(localStorage.getItem('up_stock')  || 'null') || INIT_STOCK.map(p=>({...p})),
-    log:        JSON.parse(localStorage.getItem('up_log')    || '[]'),
-    customCats: JSON.parse(localStorage.getItem('up_cats')   || '[]'),
+    stock:      JSON.parse(localStorage.getItem('up_stock') ||'null')||INIT_STOCK.map(p=>({...p})),
+    log:        JSON.parse(localStorage.getItem('up_log')   ||'[]'),
+    customCats: JSON.parse(localStorage.getItem('up_cats')  ||'[]'),
   };
 }
-
-// saveState agora salva local E envia para nuvem com debounce
-function saveState() {
-  saveStateLocal();
-  syncToCloud(); // debounced — não bloqueia
+function saveStateLocal() {
+  localStorage.setItem('up_stock',      JSON.stringify(STATE.stock));
+  localStorage.setItem('up_log',        JSON.stringify(STATE.log));
+  localStorage.setItem('up_cats',       JSON.stringify(STATE.customCats||[]));
+  localStorage.setItem('up_updated_at', new Date().toISOString());
 }
-
+function saveState() { saveStateLocal(); syncToCloud(); }
 let STATE = loadState();
 
 // ════════════════════════════════════════
@@ -2562,20 +2536,10 @@ document.addEventListener('DOMContentLoaded', ()=>{
   updateClock();
   setInterval(updateClock, 1000);
   renderOverview();
-
-  // ── SYNC INIT ──
-  // Ao abrir, puxa da nuvem — se nuvem for mais recente, atualiza tudo
+  // ── SYNC ──
   syncFromCloud();
-
-  // Auto-sincroniza a cada 60 segundos em segundo plano
-  setInterval(() => {
-    if (syncOnline) syncFromCloud();
-  }, 60000);
-
-  // Sincroniza ao voltar para a aba (celular/PC alternando)
-  document.addEventListener('visibilitychange', () => {
-    if (document.visibilityState === 'visible') syncFromCloud();
-  });
+  setInterval(()=>{ if(syncOnline) syncFromCloud(); }, 60000);
+  document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='visible') syncFromCloud(); });
 });
 </script>
 </body>
